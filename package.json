@@ -2,9 +2,8 @@
   "name": "document-finder",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "start": "cd backend && npm run start",
-    "dev": "cd backend && npm run dev",
-    "install": "cd backend && npm install"
-  }
+  "workspaces": [
+    "backend",
+    "client"
+  ]
 }
