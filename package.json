@@ -2,8 +2,5 @@
   "name": "document-finder",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "backend",
-    "client"
-  ]
+  "description": "Manufacturing & Quality Instruction Document Finder"
 }
