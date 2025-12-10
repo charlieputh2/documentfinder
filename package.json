@@ -4,6 +4,7 @@
   "private": true,
   "description": "Manufacturing & Quality Instruction Document Finder",
   "scripts": {
+    "install": "cd backend && npm install",
     "start": "cd backend && npm run start"
   }
 }
