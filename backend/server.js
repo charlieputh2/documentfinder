@@ -141,7 +141,7 @@ app.get('/', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Manufacturing & Quality Instruction Document Finder API',
-    version: '1.0.0'
+    version: '1.0.1'
   });
 });
 
