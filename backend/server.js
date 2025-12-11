@@ -10,7 +10,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 
 import routes from './routes/index.js';
-import { sequelize } from './models/index.js';
+import { sequelize, User } from './models/index.js';
 
 dotenv.config();
 
@@ -142,11 +142,44 @@ app.use((err, req, res, next) => {
   });
 });
 
+const seedAdminUser = async () => {
+  try {
+    const existingAdmin = await User.findOne({
+      where: { email: 'melanie@admin.com' }
+    });
+
+    if (existingAdmin) {
+      console.log('✅ Admin user already exists');
+      return;
+    }
+
+    await User.create({
+      firstName: 'Melanie',
+      middleName: 'Chavaria',
+      lastName: 'Birmingham',
+      suffix: '',
+      email: 'melanie@admin.com',
+      password: "Ma'am123",
+      role: 'admin',
+      isVerified: true,
+      photoUrl: 'https://via.placeholder.com/150?text=Melanie',
+      photoPublicId: 'placeholder-admin'
+    });
+
+    console.log('✅ Admin user created successfully');
+    console.log('📧 Email: melanie@admin.com');
+    console.log('🔐 Password: Ma\'am123');
+  } catch (error) {
+    console.error('⚠️ Error seeding admin user:', error.message);
+  }
+};
+
 const bootstrap = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connection established');
     await sequelize.sync({ alter: true });
+    await seedAdminUser();
     server.listen(PORT, () => {
       console.log(`🚀 Server listening on port ${PORT}`);
     });
