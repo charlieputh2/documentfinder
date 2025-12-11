@@ -23,85 +23,18 @@ const PORT = process.env.PORT || 5000;
 
 app.set('trust proxy', 1);
 
-const parseOrigins = (value = '') => value
-  .split(',')
-  .map((item) => item.trim())
-  .filter(Boolean);
-
-const defaultFrontend = process.env.FRONTEND_URL || 'http://localhost:5173';
-const configuredOrigins = parseOrigins(process.env.FRONTEND_URLS || defaultFrontend);
-const extraOrigins = parseOrigins(process.env.EXTRA_ALLOWED_ORIGINS);
-const renderUrl = process.env.RENDER_EXTERNAL_URL;
-const vercelDomain = process.env.VERCEL_FRONTEND_DOMAIN;
-
-console.log('🔐 CORS Configuration:');
-console.log('  Configured Origins:', configuredOrigins);
-console.log('  Extra Origins:', extraOrigins);
-console.log('  Render URL:', renderUrl);
-console.log('  Vercel Domain:', vercelDomain);
-
-const buildCorsOriginValidator = () => {
-  const staticOrigins = new Set([
-    ...configuredOrigins,
-    ...extraOrigins,
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:5176',
-    'https://localhost:5173',
-    'https://documentfinder.vercel.app'
-  ]);
-
-  if (renderUrl) {
-    staticOrigins.add(renderUrl);
+// Simple CORS middleware - allow all origins
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
   }
-
-  const allowSubdomain = (origin, baseUrl) => {
-    if (!baseUrl) return false;
-    try {
-      const baseHost = new URL(baseUrl).hostname;
-      const originHost = new URL(origin).hostname;
-      return originHost === baseHost || originHost.endsWith(`.${baseHost}`);
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const isLocalhost = (origin) => {
-    try {
-      const url = new URL(origin);
-      return url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-    } catch {
-      return false;
-    }
-  };
-
-  const isVercelDomain = (origin) => {
-    try {
-      const url = new URL(origin);
-      return url.hostname.endsWith('.vercel.app');
-    } catch {
-      return false;
-    }
-  };
-
-  return (origin, callback) => {
-    if (
-      !origin ||
-      staticOrigins.has(origin) ||
-      isLocalhost(origin) ||
-      isVercelDomain(origin) ||
-      allowSubdomain(origin, renderUrl) ||
-      allowSubdomain(origin, vercelDomain ? `https://${vercelDomain}` : null)
-    ) {
-      callback(null, true);
-    } else {
-      console.warn('❌ CORS rejected origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  };
-};
+  
+  next();
+});
 
 app.use(cors({
   origin: '*',
