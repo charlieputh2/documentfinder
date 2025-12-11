@@ -104,8 +104,12 @@ const buildCorsOriginValidator = () => {
 };
 
 app.use(cors({
-  origin: buildCorsOriginValidator(),
-  credentials: true
+  origin: function(origin, callback) {
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(helmet());
 app.use(compression());
