@@ -49,7 +49,8 @@ const buildCorsOriginValidator = () => {
     'http://localhost:5174',
     'http://localhost:5175',
     'http://localhost:5176',
-    'https://localhost:5173'
+    'https://localhost:5173',
+    'https://documentfinder.vercel.app'
   ]);
 
   if (renderUrl) {
