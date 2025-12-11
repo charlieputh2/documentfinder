@@ -77,11 +77,21 @@ const buildCorsOriginValidator = () => {
     }
   };
 
+  const isVercelDomain = (origin) => {
+    try {
+      const url = new URL(origin);
+      return url.hostname.endsWith('.vercel.app');
+    } catch {
+      return false;
+    }
+  };
+
   return (origin, callback) => {
     if (
       !origin ||
       staticOrigins.has(origin) ||
       isLocalhost(origin) ||
+      isVercelDomain(origin) ||
       allowSubdomain(origin, renderUrl) ||
       allowSubdomain(origin, vercelDomain ? `https://${vercelDomain}` : null)
     ) {
