@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../../lib/api.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 import DocumentFilters from '../../components/dashboard/DocumentFilters.jsx';
 import DocumentUpload from '../../components/dashboard/DocumentUpload.jsx';
 import DocumentCard from '../../components/dashboard/DocumentCard.jsx';
@@ -22,6 +23,7 @@ const initialFilters = {
 };
 
 const Dashboard = () => {
+  const { isAdmin } = useAuth();
   const [filters, setFilters] = useState(initialFilters);
   const [documents, setDocuments] = useState([]);
   const [overview, setOverview] = useState(null);
@@ -32,6 +34,7 @@ const Dashboard = () => {
   const [loadingOverview, setLoadingOverview] = useState(true);
   const [activeDocument, setActiveDocument] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   // Pull to refresh functionality
   const refreshData = async () => {
@@ -158,6 +161,19 @@ const Dashboard = () => {
     setActiveDocument(null);
   };
 
+  const handleSeedDocuments = async () => {
+    setSeeding(true);
+    try {
+      const { data } = await api.post('/seed');
+      toast.success(`${data.created} sample documents created!`);
+      await refreshData();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to seed documents');
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const handleDownloadDocument = async (doc, preferredExtension) => {
     if (!doc) return;
     try {
@@ -209,6 +225,41 @@ const Dashboard = () => {
       <div className="animate-fadeIn">
         <StatsGrid overview={overview} loading={loadingOverview} />
       </div>
+
+      {/* Empty State - Seed Documents Banner */}
+      {!loadingOverview && isAdmin && overview?.totals?.totalDocuments === 0 && (
+        <div className="animate-fadeIn rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4 sm:p-6">
+          <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left sm:gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-2xl sm:h-14 sm:w-14">
+              📄
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base font-bold text-white sm:text-lg">No documents yet</h3>
+              <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+                Your vault is empty. Load 30 sample documents across all 6 document types (MN, MI, QI, QAN, VA, PCA) to get started.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleSeedDocuments}
+              disabled={seeding}
+              className="shrink-0 flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wide text-white shadow-lg shadow-primary/30 transition-all hover:shadow-xl hover:shadow-primary/40 active:scale-95 disabled:opacity-60 sm:px-6 sm:py-3 sm:text-sm touch-manipulation"
+            >
+              {seeding ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Seeding...
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                  Load Sample Data
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Analytics Dashboard - Full Width - Responsive */}
       <div className="animate-fadeIn">
