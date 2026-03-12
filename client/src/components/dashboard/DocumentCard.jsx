@@ -1,28 +1,41 @@
 import dayjs from 'dayjs';
-import { Download, Eye } from 'lucide-react';
+import { Download, Eye, Pencil, Trash2 } from 'lucide-react';
 import { formatFileSize, getFormatLabel } from '../../utils/documents.js';
 import { getDocumentTypeConfig } from '../../constants/documentTypes.js';
 
-const DocumentCard = ({ document, onPreview, onDownload }) => {
+const DocumentCard = ({ document, onPreview, onDownload, onEdit, onDelete }) => {
   const tags = Array.isArray(document.tags) ? document.tags : [];
   const formatLabel = getFormatLabel(document.fileType);
   const fileSize = formatFileSize(document.fileSize);
   const typeConfig = getDocumentTypeConfig(document.documentType);
 
-  const handlePreviewClick = () => {
-    onPreview?.(document);
-  };
-
-  const handleDownloadClick = () => {
-    onDownload?.(document);
-  };
-
   return (
     <article className="group flex flex-col justify-between rounded-lg border border-white/10 bg-[#15161b] p-2.5 shadow-lg shadow-black/40 transition hover:-translate-y-0.5 hover:border-primary/40 active:scale-[0.98] sm:rounded-2xl sm:p-5 touch-manipulation tap-highlight animate-slide-up">
       <div className="space-y-2 sm:space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-1.5 text-2xs uppercase tracking-[0.35em] text-slate-500 sm:gap-3 sm:text-xs">
-          <span className="truncate">{document.category}</span>
-          <span className="whitespace-nowrap">{dayjs(document.createdAt).format('DD MMM YY')}</span>
+        <div className="flex items-center justify-between gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5 text-2xs uppercase tracking-[0.35em] text-slate-500 sm:gap-3 sm:text-xs">
+            <span className="truncate">{document.category}</span>
+            <span className="whitespace-nowrap">{dayjs(document.createdAt).format('DD MMM YY')}</span>
+          </div>
+          {/* Edit/Delete actions */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              type="button"
+              onClick={() => onEdit?.(document)}
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400 active:scale-90 touch-manipulation"
+              title="Edit"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete?.(document)}
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-red-500/10 hover:text-red-400 active:scale-90 touch-manipulation"
+              title="Delete"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
         <div>
@@ -74,7 +87,7 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
         <div className="flex gap-2 sm:flex-row sm:gap-2">
           <button
             type="button"
-            onClick={handlePreviewClick}
+            onClick={() => onPreview?.(document)}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-3 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:min-h-0 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
           >
             <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -82,7 +95,7 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
           </button>
           <button
             type="button"
-            onClick={handleDownloadClick}
+            onClick={() => onDownload?.(document)}
             className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-primary/50 px-3 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:min-h-0 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
           >
             <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

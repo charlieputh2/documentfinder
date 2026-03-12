@@ -32,19 +32,20 @@ export default (sequelize) => {
     },
     fileUrl: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     filePublicId: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     fileType: {
       type: DataTypes.STRING(120),
-      allowNull: false
+      allowNull: true
     },
     fileSize: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: true,
+      defaultValue: 0
     },
     textContent: {
       type: DataTypes.TEXT,

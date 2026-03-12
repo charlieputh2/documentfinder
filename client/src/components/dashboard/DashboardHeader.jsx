@@ -2,9 +2,36 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
+const Avatar = ({ photoUrl, initials, size = 'md' }) => {
+  const [imgError, setImgError] = useState(false);
+  const sizeClasses = {
+    sm: 'h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8',
+    md: 'h-9 w-9 sm:h-10 sm:w-10',
+    lg: 'h-10 w-10'
+  };
+  const textClasses = { sm: 'text-xs md:text-sm', md: 'text-sm', lg: 'text-sm' };
+
+  if (photoUrl && !imgError) {
+    return (
+      <img
+        src={photoUrl}
+        alt="Avatar"
+        className={`${sizeClasses[size]} rounded-full border border-primary/30 object-cover`}
+        onError={() => setImgError(true)}
+      />
+    );
+  }
+
+  return (
+    <div className={`flex ${sizeClasses[size]} items-center justify-center rounded-full border border-primary/30 bg-gradient-to-br from-primary/20 to-primary/10`}>
+      <span className={`${textClasses[size]} font-bold text-primary`}>{initials}</span>
+    </div>
+  );
+};
+
 const DashboardHeader = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -98,6 +125,11 @@ const DashboardHeader = () => {
             <Link to="/profile" className="text-xs font-medium text-slate-300 transition hover:text-white md:text-sm">
               Profile
             </Link>
+            {isAdmin && (
+              <Link to="/users" className="text-xs font-medium text-slate-300 transition hover:text-white md:text-sm">
+                Users
+              </Link>
+            )}
           </nav>
 
           {/* Right Section - Clock and User */}
@@ -116,17 +148,7 @@ const DashboardHeader = () => {
                 aria-expanded={menuOpen}
                 aria-haspopup="true"
               >
-                {user?.photoUrl ? (
-                  <img
-                    src={user.photoUrl}
-                    alt={user.name || 'User'}
-                    className="h-6 w-6 rounded-full border border-primary/30 object-cover sm:h-7 sm:w-7 md:h-8 md:w-8"
-                  />
-                ) : (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full border border-primary/30 bg-gradient-to-br from-primary/20 to-primary/10 sm:h-7 sm:w-7 md:h-8 md:w-8">
-                    <span className="text-xs font-bold text-primary md:text-sm">{initials}</span>
-                  </div>
-                )}
+                <Avatar photoUrl={user?.photoUrl} initials={initials} size="sm" />
                 <span className="hidden text-xs font-semibold text-white sm:inline md:text-sm">{user?.firstName}</span>
                 <svg
                   className={`h-3 w-3 text-slate-400 transition sm:h-4 sm:w-4 ${menuOpen ? 'rotate-180' : ''}`}
@@ -163,6 +185,15 @@ const DashboardHeader = () => {
                     >
                       📊 Dashboard
                     </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => { navigate('/users'); setMenuOpen(false); }}
+                        className="w-full rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white sm:px-3 sm:py-2 md:text-sm touch-manipulation"
+                        role="menuitem"
+                      >
+                        🛡️ Manage Users
+                      </button>
+                    )}
                   </div>
 
                   <div className="border-t border-white/5 p-1.5 sm:p-2">
@@ -195,13 +226,7 @@ const DashboardHeader = () => {
               {/* Mobile Header */}
               <div className="flex items-center justify-between border-b border-white/10 p-4">
                 <div className="flex items-center gap-3">
-                  {user?.photoUrl ? (
-                    <img src={user.photoUrl} alt={user.name || 'User'} className="h-10 w-10 rounded-full border border-primary/30 object-cover" />
-                  ) : (
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary/30 bg-gradient-to-br from-primary/20 to-primary/10">
-                      <span className="text-sm font-bold text-primary">{initials}</span>
-                    </div>
-                  )}
+                  <Avatar photoUrl={user?.photoUrl} initials={initials} size="lg" />
                   <div>
                     <p className="text-sm font-semibold text-white">{user?.name}</p>
                     <p className="text-xs text-slate-400">{user?.email}</p>
@@ -227,6 +252,11 @@ const DashboardHeader = () => {
                   <Link to="/profile" onClick={closeAllMenus} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white touch-manipulation">
                     👤 My Profile
                   </Link>
+                  {isAdmin && (
+                    <Link to="/users" onClick={closeAllMenus} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white touch-manipulation">
+                      🛡️ Manage Users
+                    </Link>
+                  )}
                 </div>
               </nav>
 

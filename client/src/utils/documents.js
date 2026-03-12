@@ -1,4 +1,4 @@
-const endsWith = (value = '', suffix = '') => value.toLowerCase().split('?')[0].endsWith(suffix);
+import api from '../lib/api.js';
 
 const slugify = (value = '') =>
   value
@@ -7,12 +7,6 @@ const slugify = (value = '') =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '') || 'document';
-
-const guessExtensionFromUrl = (url = '') => {
-  const clean = url.split('?')[0];
-  if (!clean.includes('.')) return '';
-  return clean.substring(clean.lastIndexOf('.') + 1).toLowerCase();
-};
 
 export const getFormatLabel = (mime = '') => {
   if (!mime) return 'File';
@@ -45,17 +39,16 @@ export const formatFileSize = (bytes = 0) => {
   return `${value.toFixed(value >= 10 || idx === 0 ? 0 : 1)} ${units[idx]}`;
 };
 
+const endsWith = (value = '', suffix = '') => value.toLowerCase().split('?')[0].endsWith(suffix);
+
 export const getAvailableFormats = (doc = {}) => {
   const mime = doc?.fileType?.toLowerCase() || '';
   const url = doc?.fileUrl?.toLowerCase() || '';
-
   return {
     pdf: mime.includes('pdf') || endsWith(url, '.pdf'),
     docx: mime.includes('officedocument') || endsWith(url, '.docx'),
     doc: mime.includes('msword') || endsWith(url, '.doc'),
-    image:
-      mime.startsWith('image/') ||
-      /\.(png|jpe?g|gif|bmp|webp)$/i.test(url)
+    image: mime.startsWith('image/') || /\.(png|jpe?g|gif|bmp|webp)$/i.test(url)
   };
 };
 
@@ -70,35 +63,50 @@ export const downloadDocumentFile = async ({ doc, preferredExtension } = {}) => 
     throw new Error('Downloads are not available in this environment');
   }
 
-  if (!doc?.fileUrl) {
-    throw new Error('Document is missing a file URL');
+  if (!doc?.id && !doc?.fileUrl) {
+    throw new Error('Document is missing');
   }
 
-  const available = getAvailableFormats(doc);
-  const normalizedPref = preferredExtension?.toLowerCase();
+  // Use the backend proxy to avoid CORS issues
+  if (doc.id) {
+    try {
+      const response = await api.get(`/documents/${doc.id}/download`, {
+        responseType: 'blob'
+      });
 
-  if (normalizedPref && !available[normalizedPref]) {
-    throw new Error(`${normalizedPref.toUpperCase()} format is not available for this file`);
+      const ext = preferredExtension || getExtensionFromMime(doc.fileType) || 'file';
+      const filename = buildFilename(doc.title, ext);
+
+      const href = URL.createObjectURL(response.data);
+      const anchor = window.document.createElement('a');
+      anchor.href = href;
+      anchor.download = filename;
+      window.document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(href), 4000);
+      return;
+    } catch (proxyError) {
+      console.warn('Proxy download failed, trying direct:', proxyError.message);
+      // Fall through to direct download
+    }
   }
 
-  const inferredExtension =
-    normalizedPref ||
-    getExtensionFromMime(doc.fileType) ||
-    guessExtensionFromUrl(doc.fileUrl) ||
-    'file';
-
-  const response = await fetch(doc.fileUrl);
-  if (!response.ok) {
-    throw new Error('Unable to download file right now');
+  // Fallback: direct download (may fail with CORS for external URLs)
+  if (!doc.fileUrl) {
+    throw new Error('Document file URL is missing');
   }
 
-  const blob = await response.blob();
-  const href = URL.createObjectURL(blob);
+  const ext = preferredExtension || getExtensionFromMime(doc.fileType) || 'file';
+  const filename = buildFilename(doc.title, ext);
+
+  // Try opening in new tab as ultimate fallback
   const anchor = window.document.createElement('a');
-  anchor.href = href;
-  anchor.download = buildFilename(doc.title, inferredExtension);
+  anchor.href = doc.fileUrl;
+  anchor.download = filename;
+  anchor.target = '_blank';
+  anchor.rel = 'noopener noreferrer';
   window.document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  setTimeout(() => URL.revokeObjectURL(href), 4000);
 };

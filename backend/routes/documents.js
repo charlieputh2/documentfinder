@@ -182,6 +182,222 @@ router.post(
   }
 );
 
+// Bulk file upload - multiple files at once
+router.post(
+  '/bulk-upload',
+  multer({
+    storage,
+    limits: { fileSize: 20 * 1024 * 1024 },
+    fileFilter(req, file, cb) {
+      const allowed = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/jpeg',
+        'image/png'
+      ];
+      if (allowed.includes(file.mimetype)) cb(null, true);
+      else cb(new Error('Only PDF, DOC, DOCX, JPG, and PNG files are allowed'));
+    }
+  }).array('documents', 20),
+  async (req, res) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ message: 'At least one file is required' });
+      }
+
+      const { documentType, category } = req.body;
+      if (!documentType) return res.status(400).json({ message: 'Document type is required' });
+      if (!category) return res.status(400).json({ message: 'Category is required' });
+
+      const results = [];
+      const errors = [];
+
+      for (const file of req.files) {
+        try {
+          const uploadResult = await cloudinary.uploader.upload(file.path, {
+            folder: 'document-finder',
+            resource_type: 'auto'
+          });
+
+          fs.unlink(file.path, (err) => {
+            if (err) console.warn('Temp cleanup failed:', err.message);
+          });
+
+          const title = path.basename(file.originalname, path.extname(file.originalname))
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, (c) => c.toUpperCase());
+
+          const document = await Document.create({
+            title,
+            description: '',
+            documentType,
+            category,
+            tags: [],
+            version: '1.0.0',
+            fileUrl: uploadResult.secure_url,
+            filePublicId: uploadResult.public_id,
+            fileType: file.mimetype,
+            fileSize: file.size,
+            createdBy: req.user.id
+          });
+
+          results.push(document);
+        } catch (fileError) {
+          errors.push({ file: file.originalname, error: fileError.message });
+          fs.unlink(file.path, () => {});
+        }
+      }
+
+      await logAudit({
+        userId: req.user.id,
+        action: 'BULK_UPLOAD',
+        description: `${req.user.name} bulk-uploaded ${results.length} documents`,
+        metadata: { count: results.length, errors: errors.length },
+        ipAddress: req.ip
+      });
+
+      res.status(201).json({
+        created: results.length,
+        failed: errors.length,
+        errors: errors.length > 0 ? errors : undefined
+      });
+    } catch (error) {
+      console.error('Bulk upload error:', error);
+      res.status(500).json({ message: 'Bulk upload failed' });
+    }
+  }
+);
+
+// CSV import - create documents from CSV file
+router.post(
+  '/import-csv',
+  multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter(req, file, cb) {
+      if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only CSV files are allowed'));
+      }
+    }
+  }).single('csvFile'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'CSV file is required' });
+      }
+
+      const csvContent = fs.readFileSync(req.file.path, 'utf-8');
+      fs.unlink(req.file.path, () => {});
+
+      const lines = csvContent.split('\n').filter((line) => line.trim());
+      if (lines.length < 2) {
+        return res.status(400).json({ message: 'CSV must have a header row and at least one data row' });
+      }
+
+      // Parse header
+      const header = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/['"]/g, ''));
+      const titleIdx = header.findIndex((h) => h === 'title');
+      const typeIdx = header.findIndex((h) => h === 'type' || h === 'documenttype' || h === 'document_type');
+      const categoryIdx = header.findIndex((h) => h === 'category');
+      const descIdx = header.findIndex((h) => h === 'description');
+      const tagsIdx = header.findIndex((h) => h === 'tags');
+      const versionIdx = header.findIndex((h) => h === 'version');
+
+      if (titleIdx === -1) {
+        return res.status(400).json({ message: 'CSV must have a "title" column' });
+      }
+
+      const validTypes = ['MN', 'MI', 'QI', 'QAN', 'VA', 'PCA', 'manufacturing', 'quality'];
+      const results = [];
+      const errors = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        try {
+          const values = parseCSVLine(lines[i]);
+          const title = values[titleIdx]?.trim();
+          if (!title) {
+            errors.push({ row: i + 1, error: 'Missing title' });
+            continue;
+          }
+
+          const docType = typeIdx !== -1 ? values[typeIdx]?.trim().toUpperCase() : 'MN';
+          const finalType = validTypes.includes(docType) ? docType : 'MN';
+          const cat = categoryIdx !== -1 ? values[categoryIdx]?.trim() : 'General';
+          const desc = descIdx !== -1 ? values[descIdx]?.trim() : '';
+          const tags = tagsIdx !== -1
+            ? values[tagsIdx]?.split(';').map((t) => t.trim()).filter(Boolean)
+            : [];
+          const version = versionIdx !== -1 ? values[versionIdx]?.trim() : '1.0.0';
+
+          const document = await Document.create({
+            title,
+            description: desc || '',
+            documentType: finalType,
+            category: cat || 'General',
+            tags,
+            version: version || '1.0.0',
+            fileUrl: null,
+            filePublicId: null,
+            fileType: null,
+            fileSize: 0,
+            createdBy: req.user.id
+          });
+
+          results.push(document);
+        } catch (rowError) {
+          errors.push({ row: i + 1, error: rowError.message });
+        }
+      }
+
+      await logAudit({
+        userId: req.user.id,
+        action: 'CSV_IMPORT',
+        description: `${req.user.name} imported ${results.length} documents from CSV`,
+        metadata: { count: results.length, errors: errors.length },
+        ipAddress: req.ip
+      });
+
+      res.status(201).json({
+        created: results.length,
+        failed: errors.length,
+        errors: errors.length > 0 ? errors : undefined
+      });
+    } catch (error) {
+      console.error('CSV import error:', error);
+      res.status(500).json({ message: 'CSV import failed' });
+    }
+  }
+);
+
+// Helper to parse CSV lines (handles quoted values with commas)
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 router.get('/', async (req, res) => {
   try {
     const {
@@ -247,6 +463,40 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('List error:', error);
     res.status(500).json({ message: 'Unable to fetch documents' });
+  }
+});
+
+// Export all documents (no pagination) for CSV/PDF/Word export
+router.get('/export-all', async (req, res) => {
+  try {
+    const { search, documentType, category, tags, fileType } = req.query;
+    const where = { isActive: true };
+
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+    if (documentType) where.documentType = documentType;
+    if (category) where.category = category;
+    if (tags) where.tags = { [Op.contains]: tags.split(',').map((t) => t.trim()) };
+    if (fileType) {
+      if (fileType.includes('%')) where.fileType = { [Op.iLike]: fileType };
+      else if (fileType.includes('*')) where.fileType = { [Op.iLike]: fileType.replace('*', '%') };
+      else where.fileType = fileType;
+    }
+
+    const documents = await Document.findAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      include: [{ association: 'author', attributes: ['id', 'name', 'email'] }]
+    });
+
+    res.json({ documents });
+  } catch (error) {
+    console.error('Export-all error:', error);
+    res.status(500).json({ message: 'Unable to fetch documents for export' });
   }
 });
 
@@ -381,6 +631,45 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     console.error('Update error:', error);
     res.status(500).json({ message: 'Unable to update document' });
+  }
+});
+
+// Proxy download - avoids CORS issues with external file URLs
+router.get('/:id/download', async (req, res) => {
+  try {
+    const document = await Document.findByPk(req.params.id);
+    if (!document || !document.isActive) {
+      return res.status(404).json({ message: 'Document not found' });
+    }
+
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch(document.fileUrl);
+    if (!response.ok) {
+      return res.status(502).json({ message: 'Unable to fetch file from storage' });
+    }
+
+    // Build filename
+    const extMap = {
+      'application/pdf': '.pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+      'application/msword': '.doc',
+      'image/jpeg': '.jpg',
+      'image/png': '.png'
+    };
+    const ext = extMap[document.fileType] || '';
+    const safeName = document.title.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const filename = `${safeName}${ext}`;
+
+    res.set({
+      'Content-Type': document.fileType || 'application/octet-stream',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Cache-Control': 'no-cache'
+    });
+
+    response.body.pipe(res);
+  } catch (error) {
+    console.error('Download proxy error:', error);
+    res.status(500).json({ message: 'Unable to download file' });
   }
 });
 

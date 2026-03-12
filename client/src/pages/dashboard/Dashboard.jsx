@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 import api from '../../lib/api.js';
 import { useAuth } from '../../context/AuthContext.jsx';
 import DocumentFilters from '../../components/dashboard/DocumentFilters.jsx';
 import DocumentUpload from '../../components/dashboard/DocumentUpload.jsx';
-import DocumentCard from '../../components/dashboard/DocumentCard.jsx';
 import StatsGrid from '../../components/dashboard/StatsGrid.jsx';
 import DocumentTable from '../../components/dashboard/DocumentTable.jsx';
 import RecentDocuments from '../../components/dashboard/RecentDocuments.jsx';
 import PreviewModal from '../../components/dashboard/PreviewModal.jsx';
+import EditDocumentModal from '../../components/dashboard/EditDocumentModal.jsx';
 import AnalyticsDashboard from '../../components/dashboard/AnalyticsDashboard.jsx';
 import { downloadDocumentFile } from '../../utils/documents.js';
 import usePullToRefresh from '../../hooks/usePullToRefresh.js';
@@ -33,39 +34,11 @@ const Dashboard = () => {
   const [loadingDocuments, setLoadingDocuments] = useState(true);
   const [loadingOverview, setLoadingOverview] = useState(true);
   const [activeDocument, setActiveDocument] = useState(null);
+  const [editDocument, setEditDocument] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
-  // Pull to refresh functionality
-  const refreshData = async () => {
-    await Promise.all([
-      fetchOverview(),
-      fetchDocuments(1, filters),
-      fetchReferenceData()
-    ]);
-  };
-
-  const {
-    containerRef,
-    isPulling,
-    pullDistance,
-    isRefreshing,
-    pullIndicatorOpacity,
-    shouldRefresh
-  } = usePullToRefresh(refreshData);
-
-  // Swipe gesture for mobile filters
-  const handleSwipeLeft = () => {
-    setShowMobileFilters(false);
-  };
-
-  const handleSwipeRight = () => {
-    setShowMobileFilters(true);
-  };
-
-  const swipeRef = useSwipeGesture(handleSwipeLeft, handleSwipeRight);
-
-  const fetchOverview = async () => {
+  const fetchOverview = useCallback(async () => {
     try {
       const { data } = await api.get('/documents/overview');
       setOverview(data);
@@ -74,9 +47,9 @@ const Dashboard = () => {
     } finally {
       setLoadingOverview(false);
     }
-  };
+  }, []);
 
-  const fetchDocuments = async (page = 1, currentFilters = filters) => {
+  const fetchDocuments = useCallback(async (page = 1, currentFilters = filters) => {
     setLoadingDocuments(true);
     try {
       const params = {
@@ -97,16 +70,15 @@ const Dashboard = () => {
       });
     } catch (error) {
       console.error('Document list error', error);
-      // Only show toast on actual errors, not on rate limiting
       if (error.response?.status !== 429) {
         toast.error('Unable to load documents');
       }
     } finally {
       setLoadingDocuments(false);
     }
-  };
+  }, []);
 
-  const fetchReferenceData = async () => {
+  const fetchReferenceData = useCallback(async () => {
     try {
       const [catRes, tagRes] = await Promise.all([
         api.get('/documents/categories'),
@@ -117,7 +89,31 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Ref data error', error);
     }
-  };
+  }, []);
+
+  // Pull to refresh
+  const refreshData = useCallback(async () => {
+    await Promise.all([
+      fetchOverview(),
+      fetchDocuments(1, filters),
+      fetchReferenceData()
+    ]);
+  }, [fetchOverview, fetchDocuments, fetchReferenceData, filters]);
+
+  const {
+    containerRef,
+    isPulling,
+    pullDistance,
+    isRefreshing,
+    pullIndicatorOpacity,
+    shouldRefresh
+  } = usePullToRefresh(refreshData);
+
+  // Swipe gesture for mobile filters
+  const swipeRef = useSwipeGesture(
+    () => setShowMobileFilters(false),
+    () => setShowMobileFilters(true)
+  );
 
   // Initial load + periodic refresh
   useEffect(() => {
@@ -125,7 +121,7 @@ const Dashboard = () => {
     fetchReferenceData();
     const interval = setInterval(fetchOverview, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchOverview, fetchReferenceData]);
 
   // When filters change, reset to page 1 and fetch
   useEffect(() => {
@@ -133,7 +129,7 @@ const Dashboard = () => {
     fetchDocuments(1, filters);
   }, [filters.search, filters.documentType, filters.category, filters.tag, filters.fileType]);
 
-  // When pagination page changes, fetch documents
+  // When pagination page changes (beyond page 1), fetch documents
   useEffect(() => {
     if (pagination.page > 1) {
       fetchDocuments(pagination.page, filters);
@@ -148,9 +144,17 @@ const Dashboard = () => {
     setFilters(initialFilters);
   };
 
+  // Refresh everything after data changes
+  const refreshAll = useCallback(async () => {
+    await Promise.all([
+      fetchOverview(),
+      fetchDocuments(pagination.page, filters),
+      fetchReferenceData()
+    ]);
+  }, [fetchOverview, fetchDocuments, fetchReferenceData, pagination.page, filters]);
+
   const handleDocumentUploaded = () => {
-    fetchOverview();
-    fetchDocuments(1);
+    refreshAll();
   };
 
   const handlePreviewDocument = (doc) => {
@@ -161,12 +165,53 @@ const Dashboard = () => {
     setActiveDocument(null);
   };
 
+  const handleEditDocument = (doc) => {
+    setEditDocument(doc);
+  };
+
+  const handleEditSaved = () => {
+    setEditDocument(null);
+    refreshAll();
+  };
+
+  const handleDeleteDocument = async (doc) => {
+    if (!doc?.id) return;
+
+    const result = await Swal.fire({
+      title: 'Delete Document?',
+      html: `<p style="color:#94a3b8">Are you sure you want to delete <strong style="color:#fff">${doc.title}</strong>?</p><p style="color:#64748b;font-size:0.85em;margin-top:8px">This action will archive the document.</p>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#374151',
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel',
+      background: '#1a1b22',
+      color: '#fff',
+      customClass: {
+        popup: 'border border-white/10 rounded-2xl',
+        confirmButton: 'rounded-xl px-6',
+        cancelButton: 'rounded-xl px-6'
+      }
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await api.delete(`/documents/${doc.id}`);
+      toast.success('Document deleted');
+      refreshAll();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete document');
+    }
+  };
+
   const handleSeedDocuments = async () => {
     setSeeding(true);
     try {
       const { data } = await api.post('/seed');
       toast.success(`${data.created} sample documents created!`);
-      await refreshData();
+      await refreshAll();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to seed documents');
     } finally {
@@ -184,12 +229,15 @@ const Dashboard = () => {
     }
   };
 
+  // Count active filters
+  const activeFilterCount = [filters.search, filters.documentType, filters.category, filters.tag, filters.fileType].filter(Boolean).length;
+
   return (
     <div className="w-full space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8" ref={containerRef}>
       {/* Pull to Refresh Indicator */}
-      <div 
+      <div
         className="fixed top-0 left-0 right-0 z-50 flex justify-center pointer-events-none"
-        style={{ 
+        style={{
           transform: `translateY(${pullDistance}px)`,
           opacity: pullIndicatorOpacity
         }}
@@ -215,13 +263,18 @@ const Dashboard = () => {
       <div className="lg:hidden">
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
-          className="fixed bottom-4 left-4 z-40 rounded-full bg-primary/90 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-primary/30 backdrop-blur-sm touch-manipulation tap-highlight active:scale-95 transition-all sm:text-sm"
+          className="fixed bottom-4 left-4 z-40 flex items-center gap-1.5 rounded-full bg-primary/90 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-primary/30 backdrop-blur-sm touch-manipulation tap-highlight active:scale-95 transition-all sm:text-sm"
         >
           {showMobileFilters ? 'Hide Filters' : 'Filters'}
+          {activeFilterCount > 0 && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-primary text-2xs font-bold">
+              {activeFilterCount}
+            </span>
+          )}
         </button>
       </div>
 
-      {/* Stats Grid - Full Width - Responsive */}
+      {/* Stats Grid */}
       <div className="animate-fadeIn">
         <StatsGrid overview={overview} loading={loadingOverview} />
       </div>
@@ -261,14 +314,14 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Analytics Dashboard - Full Width - Responsive */}
+      {/* Analytics Dashboard */}
       <div className="animate-fadeIn">
         <AnalyticsDashboard overview={overview} loading={loadingOverview} documents={documents} />
       </div>
 
-      {/* Main Content - Responsive Grid - Mobile First */}
+      {/* Main Content - Responsive Grid */}
       <div className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-8 grid-cols-1 lg:grid-cols-4" ref={swipeRef}>
-        {/* Sidebar - Filters and Upload - Collapsible on Mobile */}
+        {/* Sidebar - Filters and Upload */}
         <div className={`space-y-3 sm:space-y-4 md:space-y-6 lg:col-span-1 animate-slideInLeft ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
           <DocumentFilters
             filters={filters}
@@ -276,6 +329,7 @@ const Dashboard = () => {
             onReset={handleResetFilters}
             categories={categories}
             tags={tags}
+            activeCount={activeFilterCount}
           />
           <DocumentUpload
             onUploaded={handleDocumentUploaded}
@@ -283,12 +337,14 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Main Content - Documents - Full Width on Mobile */}
+        {/* Main Content - Documents */}
         <div className="space-y-3 sm:space-y-4 md:space-y-6 lg:col-span-3 animate-slideInRight">
           <RecentDocuments
             documents={overview?.recentDocuments || []}
             onPreview={handlePreviewDocument}
             onDownload={handleDownloadDocument}
+            onEdit={handleEditDocument}
+            onDelete={handleDeleteDocument}
           />
           <DocumentTable
             documents={documents}
@@ -297,6 +353,10 @@ const Dashboard = () => {
             onPageChange={(page) => setPagination((prev) => ({ ...prev, page }))}
             onPreview={handlePreviewDocument}
             onDownload={handleDownloadDocument}
+            onEdit={handleEditDocument}
+            onDelete={handleDeleteDocument}
+            filters={filters}
+            onImported={refreshAll}
           />
         </div>
       </div>
@@ -306,6 +366,14 @@ const Dashboard = () => {
         document={activeDocument}
         onClose={handleClosePreview}
         onDownload={handleDownloadDocument}
+      />
+
+      <EditDocumentModal
+        open={Boolean(editDocument)}
+        document={editDocument}
+        onClose={() => setEditDocument(null)}
+        onSaved={handleEditSaved}
+        categories={categories}
       />
     </div>
   );

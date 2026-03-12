@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Filter, RotateCcw, Search } from 'lucide-react';
-import { SkeletonFilters } from '../common/Skeleton.jsx';
-import { getAllDocumentTypes } from '../../constants/documentTypes.js';
+import { Filter, RotateCcw, Search, X } from 'lucide-react';
+import { getAllDocumentTypes, getDocumentTypeConfig } from '../../constants/documentTypes.js';
 
 const FILE_TYPE_OPTIONS = [
   { label: 'All formats', value: '' },
@@ -11,18 +10,16 @@ const FILE_TYPE_OPTIONS = [
   { label: 'Images', value: 'image/%' }
 ];
 
-const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [] }) => {
+const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [], activeCount = 0 }) => {
   const categoryOptions = useMemo(() => ['All categories', ...categories], [categories]);
   const documentTypeOptions = useMemo(() => getAllDocumentTypes(), []);
   const [searchInput, setSearchInput] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);
 
-  // Sync search input when filters change externally (e.g., reset)
   useEffect(() => {
     setSearchInput(filters.search || '');
   }, [filters.search]);
 
-  // Debounce search input - only search if input is not empty
   useEffect(() => {
     if (!searchInput.trim()) {
       onChange({ search: '' });
@@ -36,7 +33,28 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
       setIsSearching(false);
     }, 500);
     return () => clearTimeout(timer);
-  }, [searchInput]); // Remove onChange from dependencies to prevent infinite loop
+  }, [searchInput]);
+
+  // Active filter chips for visual feedback
+  const activeFilters = [];
+  if (filters.documentType) {
+    const config = getDocumentTypeConfig(filters.documentType);
+    activeFilters.push({ key: 'documentType', label: config?.code || filters.documentType, color: config?.color?.text || 'text-white' });
+  }
+  if (filters.category) {
+    activeFilters.push({ key: 'category', label: filters.category, color: 'text-blue-300' });
+  }
+  if (filters.tag) {
+    activeFilters.push({ key: 'tag', label: `#${filters.tag}`, color: 'text-purple-300' });
+  }
+  if (filters.fileType) {
+    const match = FILE_TYPE_OPTIONS.find(o => o.value === filters.fileType);
+    activeFilters.push({ key: 'fileType', label: match?.label || 'Custom', color: 'text-emerald-300' });
+  }
+
+  const removeFilter = (key) => {
+    onChange({ [key]: '' });
+  };
 
   return (
     <section className="rounded-lg border border-white/5 bg-[#1c1d22] p-2.5 shadow-lg shadow-black/40 sm:rounded-2xl sm:p-6 animate-slide-up touch-manipulation">
@@ -45,18 +63,47 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
           <Filter className="h-4 w-4 text-primary/70 sm:h-5 sm:w-5" />
           <div>
             <p className="text-2xs uppercase tracking-[0.35em] text-primary/70 sm:text-xs">Filters</p>
-            <h3 className="font-heading text-base text-white sm:text-xl lg:text-2xl">Search documents</h3>
+            <h3 className="font-heading text-base text-white sm:text-xl lg:text-2xl">
+              Search documents
+              {activeCount > 0 && (
+                <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-2xs font-bold text-white align-middle">
+                  {activeCount}
+                </span>
+              )}
+            </h3>
           </div>
         </div>
         <button
           type="button"
           onClick={onReset}
-          className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/20 active:scale-95 sm:w-auto sm:px-4 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
+          disabled={activeCount === 0 && !searchInput}
+          className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/20 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed sm:w-auto sm:px-4 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
         >
           <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
           <span>Reset</span>
         </button>
       </div>
+
+      {/* Active Filter Chips */}
+      {activeFilters.length > 0 && (
+        <div className="mb-3 flex flex-wrap gap-1.5 sm:mb-4">
+          {activeFilters.map((f) => (
+            <span
+              key={f.key}
+              className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-2xs font-semibold sm:text-xs"
+            >
+              <span className={f.color}>{f.label}</span>
+              <button
+                type="button"
+                onClick={() => removeFilter(f.key)}
+                className="rounded-full p-0.5 text-slate-400 hover:text-white transition touch-manipulation"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="space-y-2.5 sm:space-y-4">
         <label className="space-y-1.5 text-2xs sm:space-y-2 sm:text-sm">
@@ -88,20 +135,22 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 transition hover:text-white active:scale-90 sm:right-3 touch-manipulation tap-highlight"
                 aria-label="Clear search"
               >
-                ✕
+                <X className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
-          <p className="text-3xs text-slate-500 sm:text-xs">💡 Real-time search across all documents</p>
+          <p className="text-3xs text-slate-500 sm:text-xs">Real-time search across all documents</p>
         </label>
 
-        <div className="grid gap-2 grid-cols-1 sm:gap-4 sm:grid-cols-2">
+        <div className="grid gap-2 grid-cols-1 sm:gap-3 sm:grid-cols-2">
           <label className="space-y-1.5 text-2xs sm:space-y-2 sm:text-sm">
             <span className="text-slate-300">Document Type</span>
             <select
               value={filters.documentType}
               onChange={(event) => onChange({ documentType: event.target.value })}
-              className="w-full rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight"
+              className={`w-full rounded-lg border bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight ${
+                filters.documentType ? 'border-primary/30' : 'border-white/5'
+              }`}
             >
               {documentTypeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -116,7 +165,9 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
             <select
               value={filters.category}
               onChange={(event) => onChange({ category: event.target.value })}
-              className="w-full rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight"
+              className={`w-full rounded-lg border bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight ${
+                filters.category ? 'border-primary/30' : 'border-white/5'
+              }`}
             >
               <option value="">All categories</option>
               {categoryOptions.slice(1).map((category) => (
@@ -128,13 +179,15 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
           </label>
         </div>
 
-        <div className="grid gap-2 grid-cols-1 sm:gap-4 sm:grid-cols-2">
+        <div className="grid gap-2 grid-cols-1 sm:gap-3 sm:grid-cols-2">
           <label className="space-y-1.5 text-2xs sm:space-y-2 sm:text-sm">
             <span className="text-slate-300">Tag</span>
             <select
               value={filters.tag}
               onChange={(event) => onChange({ tag: event.target.value })}
-              className="w-full rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight"
+              className={`w-full rounded-lg border bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight ${
+                filters.tag ? 'border-primary/30' : 'border-white/5'
+              }`}
             >
               <option value="">All tags</option>
               {tags.map((tag) => (
@@ -150,7 +203,9 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
             <select
               value={filters.fileType}
               onChange={(event) => onChange({ fileType: event.target.value })}
-              className="w-full rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight"
+              className={`w-full rounded-lg border bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight ${
+                filters.fileType ? 'border-primary/30' : 'border-white/5'
+              }`}
             >
               {FILE_TYPE_OPTIONS.map((option) => (
                 <option key={option.label} value={option.value}>
@@ -162,7 +217,7 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
         </div>
 
         <p className="text-3xs text-slate-500 sm:text-xs">
-          💡 Filter between PDF, DOC/DOCX, or image-based instructions. Search updates in real-time.
+          Filter between PDF, DOC/DOCX, or image-based instructions. Search updates in real-time.
         </p>
       </div>
     </section>

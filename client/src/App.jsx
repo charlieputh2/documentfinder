@@ -6,6 +6,7 @@ import Register from './pages/auth/Register.jsx';
 import VerifyEmail from './pages/auth/VerifyEmail.jsx';
 import Dashboard from './pages/dashboard/Dashboard.jsx';
 import Profile from './pages/dashboard/Profile.jsx';
+import UserManagement from './pages/dashboard/UserManagement.jsx';
 import LoadingScreen from './components/common/LoadingScreen.jsx';
 
 const ProtectedRoute = ({ children }) => {
@@ -71,6 +72,16 @@ const App = () => (
         <ProtectedRoute>
           <Layout>
             <Profile />
+          </Layout>
+        </ProtectedRoute>
+      )}
+    />
+    <Route
+      path="/users"
+      element={(
+        <ProtectedRoute>
+          <Layout>
+            <UserManagement />
           </Layout>
         </ProtectedRoute>
       )}

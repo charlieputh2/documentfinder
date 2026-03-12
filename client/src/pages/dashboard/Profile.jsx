@@ -9,6 +9,7 @@ const Profile = () => {
   const { user, logout } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [photoError, setPhotoError] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -138,11 +139,12 @@ const Profile = () => {
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-white/5 bg-[#15161b]/95 p-4 shadow-lg sm:rounded-3xl sm:p-6">
             <div className="text-center">
-              {profile?.photoUrl ? (
+              {profile?.photoUrl && !photoError ? (
                 <img
                   src={profile.photoUrl}
                   alt={profile.name}
                   className="mx-auto h-20 w-20 rounded-full border-4 border-primary/30 object-cover sm:h-24 sm:w-24"
+                  onError={() => setPhotoError(true)}
                 />
               ) : (
                 <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border-4 border-primary/30 bg-gradient-to-br from-primary/20 to-primary/10 sm:h-24 sm:w-24">

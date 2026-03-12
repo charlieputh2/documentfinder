@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import dayjs from 'dayjs';
 import { getFormatLabel, formatFileSize } from './documents.js';
 import { getDocumentTypeConfig } from '../constants/documentTypes.js';
+import api from '../lib/api.js';
 
 /**
  * Prepare document rows for export
@@ -171,6 +172,38 @@ export const exportToWord = (documents) => {
     type: 'application/msword'
   });
   downloadBlob(blob, `documents-export-${dayjs().format('YYYY-MM-DD')}.doc`);
+};
+
+// ── Fetch all documents and export ──────────────────────────────────
+
+export const fetchAllAndExport = async (format, filters = {}) => {
+  const params = {};
+  if (filters.search) params.search = filters.search;
+  if (filters.documentType) params.documentType = filters.documentType;
+  if (filters.category) params.category = filters.category;
+  if (filters.tag) params.tags = filters.tag;
+  if (filters.fileType) params.fileType = filters.fileType;
+
+  const { data } = await api.get('/documents/export-all', { params });
+  const documents = data.documents || [];
+
+  if (!documents.length) {
+    throw new Error('No documents to export');
+  }
+
+  if (format === 'csv') exportToCSV(documents);
+  else if (format === 'pdf') exportToPDF(documents);
+  else if (format === 'word') exportToWord(documents);
+};
+
+// ── Generate CSV import template ────────────────────────────────────
+
+export const downloadImportTemplate = () => {
+  const header = 'Title,Type,Category,Description,Tags,Version';
+  const example = '"Example Document","MN","Process Control","Description of the document","tag1;tag2","1.0.0"';
+  const csv = `${header}\n${example}`;
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  downloadBlob(blob, 'document-import-template.csv');
 };
 
 // ── Shared download helper ───────────────────────────────────────────

@@ -139,8 +139,8 @@ const seedAdminUser = async () => {
       password: "Ma'am123",
       role: 'admin',
       isVerified: true,
-      photoUrl: 'https://via.placeholder.com/150?text=Melanie',
-      photoPublicId: 'placeholder-admin'
+      photoUrl: null,
+      photoPublicId: null
     });
 
     console.log('✅ Admin user created successfully');
