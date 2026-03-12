@@ -38,13 +38,13 @@ export default {
   },
   production: {
     ...common,
-    ...(process.env.DATABASE_URL 
+    ...(process.env.DATABASE_URL
       ? { use_env_variable: 'DATABASE_URL' }
       : {
-          username: process.env.DB_USER || 'neondb_owner',
-          password: process.env.DB_PASSWORD || 'npg_F7l4chvSKpgD',
-          database: process.env.DB_NAME || 'neondb',
-          host: process.env.DB_HOST || 'ep-plain-mode-a4ig67kc-pooler.us-east-1.aws.neon.tech',
+          username: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_NAME,
+          host: process.env.DB_HOST,
           port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432
         }
     ),

@@ -1,50 +1,55 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 const useSwipeGesture = (onSwipeLeft, onSwipeRight, threshold = 50) => {
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
   const elementRef = useRef(null);
+  const onSwipeLeftRef = useRef(onSwipeLeft);
+  const onSwipeRightRef = useRef(onSwipeRight);
 
-  const minSwipeDistance = threshold;
-
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && onSwipeLeft) {
-      onSwipeLeft();
-    }
-    if (isRightSwipe && onSwipeRight) {
-      onSwipeRight();
-    }
-  };
+  // Keep refs in sync
+  onSwipeLeftRef.current = onSwipeLeft;
+  onSwipeRightRef.current = onSwipeRight;
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    element.addEventListener('touchstart', onTouchStart, { passive: true });
-    element.addEventListener('touchmove', onTouchMove, { passive: true });
-    element.addEventListener('touchend', onTouchEnd, { passive: true });
+    let startX = null;
+    let endX = null;
+
+    const handleTouchStart = (e) => {
+      endX = null;
+      startX = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchMove = (e) => {
+      endX = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+      if (startX === null || endX === null) return;
+
+      const distance = startX - endX;
+      if (distance > threshold && onSwipeLeftRef.current) {
+        onSwipeLeftRef.current();
+      }
+      if (distance < -threshold && onSwipeRightRef.current) {
+        onSwipeRightRef.current();
+      }
+
+      startX = null;
+      endX = null;
+    };
+
+    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+    element.addEventListener('touchmove', handleTouchMove, { passive: true });
+    element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      element.removeEventListener('touchstart', onTouchStart);
-      element.removeEventListener('touchmove', onTouchMove);
-      element.removeEventListener('touchend', onTouchEnd);
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
+      element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [touchStart, touchEnd, onSwipeLeft, onSwipeRight]);
+  }, [threshold]);
 
   return elementRef;
 };

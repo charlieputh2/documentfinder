@@ -15,7 +15,6 @@ const TextPreviewModal = ({ open, document, onClose }) => {
 
   const { totalPages, currentContent } = useMemo(() => {
     if (!document?.textContent) {
-      console.warn('No textContent in document:', document?.title);
       return { totalPages: 0, currentContent: '' };
     }
 
@@ -25,7 +24,6 @@ const TextPreviewModal = ({ open, document, onClose }) => {
     const end = start + CHARS_PER_PAGE;
     const content = text.substring(start, end);
 
-    console.log('Text Preview - Pages:', pages, 'Current Page:', currentPage, 'Text Length:', text.length);
     return { totalPages: pages, currentContent: content };
   }, [document?.textContent, currentPage]);
 

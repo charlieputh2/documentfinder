@@ -6,7 +6,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const logs = await AuditLog.findAll({
-      limit: Number(req.query.limit) || 25,
+      limit: Math.min(Number(req.query.limit) || 25, 100),
       order: [['createdAt', 'DESC']],
       include: [{
         model: User,

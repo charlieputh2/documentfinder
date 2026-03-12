@@ -25,14 +25,14 @@ const RecentDocuments = ({ documents = [], onPreview, onDownload }) => (
                 <button
                   type="button"
                   onClick={() => onPreview?.(doc)}
-                  className="rounded-lg border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 sm:rounded-full sm:px-4 sm:py-2"
+                  className="rounded-lg border border-white/10 px-3 py-2 min-h-[44px] text-xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 active:scale-95 sm:rounded-full sm:px-4 sm:py-2 sm:min-h-0 touch-manipulation tap-highlight"
                 >
                   Preview
                 </button>
                 <button
                   type="button"
                   onClick={() => onDownload?.(doc)}
-                  className="rounded-lg border border-primary/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white sm:rounded-full sm:px-4 sm:py-2"
+                  className="rounded-lg border border-primary/50 px-3 py-2 min-h-[44px] text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white active:scale-95 sm:rounded-full sm:px-4 sm:py-2 sm:min-h-0 touch-manipulation tap-highlight"
                 >
                   Download
                 </button>

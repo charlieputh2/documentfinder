@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
+import { Filter, RotateCcw, Search } from 'lucide-react';
 import { SkeletonFilters } from '../common/Skeleton.jsx';
+import { getAllDocumentTypes } from '../../constants/documentTypes.js';
 
 const FILE_TYPE_OPTIONS = [
   { label: 'All formats', value: '' },
@@ -11,6 +13,7 @@ const FILE_TYPE_OPTIONS = [
 
 const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [] }) => {
   const categoryOptions = useMemo(() => ['All categories', ...categories], [categories]);
+  const documentTypeOptions = useMemo(() => getAllDocumentTypes(), []);
   const [searchInput, setSearchInput] = useState(filters.search || '');
   const [isSearching, setIsSearching] = useState(false);
 
@@ -38,24 +41,36 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
   return (
     <section className="rounded-lg border border-white/5 bg-[#1c1d22] p-2.5 shadow-lg shadow-black/40 sm:rounded-2xl sm:p-6 animate-slide-up touch-manipulation">
       <div className="mb-3 flex flex-col items-start justify-between gap-2 sm:mb-6 sm:flex-row sm:items-center sm:gap-3">
-        <div>
-          <p className="text-2xs uppercase tracking-[0.35em] text-primary/70 sm:text-xs">Filters</p>
-          <h3 className="font-heading text-base text-white sm:text-xl lg:text-2xl">Search documents</h3>
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-primary/70 sm:h-5 sm:w-5" />
+          <div>
+            <p className="text-2xs uppercase tracking-[0.35em] text-primary/70 sm:text-xs">Filters</p>
+            <h3 className="font-heading text-base text-white sm:text-xl lg:text-2xl">Search documents</h3>
+          </div>
         </div>
         <button
           type="button"
           onClick={onReset}
-          className="w-full rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/20 active:scale-95 sm:w-auto sm:px-4 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
+          className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary/20 active:scale-95 sm:w-auto sm:px-4 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
         >
-          ↻ Reset
+          <RotateCcw className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span>Reset</span>
         </button>
       </div>
 
       <div className="space-y-2.5 sm:space-y-4">
         <label className="space-y-1.5 text-2xs sm:space-y-2 sm:text-sm">
           <span className="flex items-center justify-between text-slate-300">
-            <span>Keyword</span>
-            {isSearching && <span className="text-2xs text-primary sm:text-xs">Searching...</span>}
+            <span className="flex items-center gap-1.5">
+              <Search className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Keyword</span>
+            </span>
+            {isSearching && (
+              <span className="flex items-center gap-1 text-2xs text-primary sm:text-xs">
+                <div className="h-2 w-2 animate-spin rounded-full border border-primary border-t-transparent" />
+                <span>Searching...</span>
+              </span>
+            )}
           </span>
           <div className="relative">
             <input
@@ -71,25 +86,28 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
                 type="button"
                 onClick={() => setSearchInput('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 transition hover:text-white active:scale-90 sm:right-3 touch-manipulation tap-highlight"
+                aria-label="Clear search"
               >
                 ✕
               </button>
             )}
           </div>
-          <p className="text-3xs text-slate-500 sm:text-xs">Real-time search across all documents</p>
+          <p className="text-3xs text-slate-500 sm:text-xs">💡 Real-time search across all documents</p>
         </label>
 
         <div className="grid gap-2 grid-cols-1 sm:gap-4 sm:grid-cols-2">
           <label className="space-y-1.5 text-2xs sm:space-y-2 sm:text-sm">
-            <span className="text-slate-300">Instruction Type</span>
+            <span className="text-slate-300">Document Type</span>
             <select
               value={filters.documentType}
               onChange={(event) => onChange({ documentType: event.target.value })}
               className="w-full rounded-lg border border-white/5 bg-black/20 px-3 py-2 text-xs text-white transition focus:border-primary focus:outline-none sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm touch-manipulation tap-highlight"
             >
-              <option value="">All types</option>
-              <option value="manufacturing">Manufacturing</option>
-              <option value="quality">Quality</option>
+              {documentTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
 

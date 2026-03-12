@@ -1,7 +1,11 @@
 const LoadingScreen = () => (
-  <div className="flex h-screen w-full flex-col items-center justify-center gap-4 bg-secondary text-white">
-    <div className="h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-    <p className="font-heading text-lg tracking-[0.3em] text-slate-300">Synchronizing</p>
+  <div className="flex h-screen w-full flex-col items-center justify-center gap-5 bg-secondary text-white safe-area-top safe-area-bottom">
+    <img src="/logo.png" alt="Document Finder" className="h-14 w-14 object-contain opacity-80" />
+    <div className="h-10 w-10 animate-spin rounded-full border-3 border-primary/20 border-t-primary" />
+    <div className="text-center">
+      <p className="font-heading text-sm tracking-[0.3em] text-slate-300">Loading</p>
+      <p className="mt-1 text-xs text-slate-500">Please wait...</p>
+    </div>
   </div>
 );
 

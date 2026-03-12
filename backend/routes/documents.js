@@ -32,17 +32,21 @@ const storage = multer.diskStorage({
 
 router.get('/overview', async (req, res) => {
   try {
+    const manufacturingTypes = ['MN', 'MI', 'manufacturing'];
+    const qualityTypes = ['QI', 'QAN', 'quality'];
+
     const [
       totalDocuments,
       manufacturingCount,
       qualityCount,
       storageBytes,
       recentDocuments,
-      categoryBreakdown
+      categoryBreakdown,
+      typeBreakdown
     ] = await Promise.all([
       Document.count({ where: { isActive: true } }),
-      Document.count({ where: { documentType: 'manufacturing', isActive: true } }),
-      Document.count({ where: { documentType: 'quality', isActive: true } }),
+      Document.count({ where: { documentType: { [Op.in]: manufacturingTypes }, isActive: true } }),
+      Document.count({ where: { documentType: { [Op.in]: qualityTypes }, isActive: true } }),
       Document.sum('fileSize', { where: { isActive: true } }),
       Document.findAll({
         where: { isActive: true },
@@ -59,6 +63,15 @@ router.get('/overview', async (req, res) => {
         group: ['category'],
         order: [[sequelize.literal('count'), 'DESC']],
         limit: 6
+      }),
+      Document.findAll({
+        attributes: [
+          'documentType',
+          [sequelize.fn('COUNT', sequelize.col('documentType')), 'count']
+        ],
+        where: { isActive: true },
+        group: ['documentType'],
+        order: [[sequelize.literal('count'), 'DESC']]
       })
     ]);
 
@@ -72,6 +85,10 @@ router.get('/overview', async (req, res) => {
       recentDocuments,
       categoryBreakdown: categoryBreakdown.map((row) => ({
         category: row.get('category'),
+        count: Number(row.get('count'))
+      })),
+      typeBreakdown: typeBreakdown.map((row) => ({
+        type: row.get('documentType'),
         count: Number(row.get('count'))
       }))
     });
@@ -114,6 +131,11 @@ router.post(
         resource_type: 'auto'
       });
 
+      // Clean up temp file
+      fs.unlink(req.file.path, (err) => {
+        if (err) console.warn('Temp file cleanup failed:', err.message);
+      });
+
       const document = await Document.create({
         title: req.body.title,
         description: req.body.description,
@@ -153,7 +175,7 @@ router.get('/', async (req, res) => {
   try {
     const {
       page = 1,
-      limit = 12,
+      limit: rawLimit = 12,
       search,
       documentType,
       category,
@@ -161,6 +183,7 @@ router.get('/', async (req, res) => {
       fileType
     } = req.query;
 
+    const limit = Math.min(Number(rawLimit) || 12, 100);
     const where = { isActive: true };
 
     if (search) {
@@ -192,11 +215,11 @@ router.get('/', async (req, res) => {
       }
     }
 
-    const offset = (Number(page) - 1) * Number(limit);
+    const offset = (Number(page) - 1) * limit;
 
     const { rows, count } = await Document.findAndCountAll({
       where,
-      limit: Number(limit),
+      limit,
       offset,
       order: [['createdAt', 'DESC']],
       include: [{ association: 'author', attributes: ['id', 'name', 'email'] }]
@@ -207,7 +230,7 @@ router.get('/', async (req, res) => {
       pagination: {
         total: count,
         page: Number(page),
-        pages: Math.ceil(count / Number(limit))
+        pages: Math.ceil(count / limit)
       }
     });
   } catch (error) {
@@ -218,17 +241,22 @@ router.get('/', async (req, res) => {
 
 router.get('/stats', authorize('admin'), async (req, res) => {
   try {
-    const totalDocuments = await Document.count();
-    const manufacturingCount = await Document.count({ where: { documentType: 'manufacturing' } });
-    const qualityCount = await Document.count({ where: { documentType: 'quality' } });
+    const manufacturingTypes = ['MN', 'MI', 'manufacturing'];
+    const qualityTypes = ['QI', 'QAN', 'quality'];
 
-    const categories = await Document.findAll({
-      attributes: [
-        'category',
-        [sequelize.fn('COUNT', sequelize.col('category')), 'count']
-      ],
-      group: ['category']
-    });
+    const [totalDocuments, manufacturingCount, qualityCount, categories] = await Promise.all([
+      Document.count({ where: { isActive: true } }),
+      Document.count({ where: { documentType: { [Op.in]: manufacturingTypes }, isActive: true } }),
+      Document.count({ where: { documentType: { [Op.in]: qualityTypes }, isActive: true } }),
+      Document.findAll({
+        attributes: [
+          'category',
+          [sequelize.fn('COUNT', sequelize.col('category')), 'count']
+        ],
+        where: { isActive: true },
+        group: ['category']
+      })
+    ]);
 
     res.json({
       totalDocuments,
@@ -357,13 +385,12 @@ router.delete('/:id', async (req, res) => {
       return res.status(403).json({ message: 'Not authorized to delete this document' });
     }
 
-    await cloudinary.uploader.destroy(document.filePublicId);
-    await document.destroy();
+    await document.update({ isActive: false });
 
     await logAudit({
       userId: req.user.id,
       action: 'DOCUMENT_DELETED',
-      description: `${req.user.name} deleted ${document.title}`,
+      description: `${req.user.name} archived ${document.title}`,
       metadata: { documentId: document.id },
       ipAddress: req.ip
     });

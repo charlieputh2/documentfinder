@@ -162,7 +162,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-secondary px-4 py-10">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-secondary px-3 py-6 sm:px-4 sm:py-10 safe-area-top safe-area-bottom touch-manipulation">
       <div className="w-full max-w-4xl overflow-hidden rounded-[32px] border border-white/5 bg-[#0e0f13]/95 shadow-[0_30px_120px_rgba(0,0,0,0.5)]">
         <div className="grid gap-0 md:grid-cols-2">
           <div className="hidden flex-col justify-between border-r border-white/5 bg-gradient-to-b from-primary/10 to-transparent px-10 py-12 text-white md:flex">
@@ -312,14 +312,14 @@ const Register = () => {
                     )}
                   </div>
                   <div className="flex flex-1 flex-wrap gap-3 text-xs uppercase tracking-[0.3em]">
-                    <label className="flex-1 cursor-pointer rounded-2xl border border-white/10 px-4 py-3 text-center text-white transition hover:border-primary hover:bg-primary/10">
+                    <label className="flex-1 cursor-pointer rounded-2xl border border-white/10 px-4 py-3 min-h-[44px] flex items-center justify-center text-center text-white transition hover:border-primary hover:bg-primary/10 active:scale-95 touch-manipulation">
                       Upload photo
                       <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                     </label>
                     <button
                       type="button"
                       onClick={() => setCameraOpen(true)}
-                      className="flex-1 rounded-2xl border border-primary/40 px-4 py-3 text-white transition hover:bg-primary/10"
+                      className="flex-1 rounded-2xl border border-primary/40 px-4 py-3 min-h-[44px] text-white transition hover:bg-primary/10 active:scale-95 touch-manipulation"
                     >
                       Use camera
                     </button>
@@ -331,9 +331,16 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-2xl bg-primary py-3 text-sm font-semibold uppercase tracking-[0.35em] text-white shadow-glow transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70"
+                className="w-full rounded-2xl bg-primary py-3 min-h-[48px] text-sm font-semibold uppercase tracking-[0.35em] text-white shadow-glow transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-70 active:scale-95 touch-manipulation"
               >
-                {loading ? 'Creating account…' : 'Launch workspace'}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    Creating account…
+                  </span>
+                ) : (
+                  'Launch workspace'
+                )}
               </button>
             </form>
 
@@ -390,7 +397,7 @@ const Register = () => {
           Tesla near Nevada, USA · Google Maps
         </a>
         <p className="mt-2 text-[0.8rem] normal-case tracking-normal text-slate-400">
-          Made by Facebook · Melanie Chavaria Birmingham · Quality Engineering
+          Tesla Operations · Melanie Chavaria Birmingham · Quality Engineering
         </p>
       </footer>
 
@@ -414,14 +421,14 @@ const Register = () => {
               <button
                 type="button"
                 onClick={handleCapture}
-                className="flex-1 rounded-2xl bg-primary py-3 text-xs font-semibold uppercase tracking-[0.35em] text-white"
+                className="flex-1 rounded-2xl bg-primary py-3 min-h-[48px] text-xs font-semibold uppercase tracking-[0.35em] text-white active:scale-95 touch-manipulation"
               >
                 Capture photo
               </button>
               <button
                 type="button"
                 onClick={() => setCameraOpen(false)}
-                className="flex-1 rounded-2xl border border-white/10 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-slate-300 hover:border-primary hover:text-white"
+                className="flex-1 rounded-2xl border border-white/10 py-3 min-h-[48px] text-xs font-semibold uppercase tracking-[0.35em] text-slate-300 hover:border-primary hover:text-white active:scale-95 touch-manipulation"
               >
                 Cancel
               </button>
@@ -459,9 +466,16 @@ const Register = () => {
             <button
               onClick={handleOtpSubmit}
               disabled={otpLoading || otpCode.length !== 6}
-              className="w-full rounded-2xl bg-primary py-3 text-sm font-semibold uppercase tracking-[0.35em] text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-2xl bg-primary py-3 min-h-[48px] text-sm font-semibold uppercase tracking-[0.35em] text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 active:scale-95 touch-manipulation"
             >
-              {otpLoading ? 'Verifying...' : 'Verify Account'}
+              {otpLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Verifying...
+                </span>
+              ) : (
+                'Verify Account'
+              )}
             </button>
 
             <button
@@ -469,7 +483,7 @@ const Register = () => {
                 setShowOtpModal(false);
                 setOtpCode('');
               }}
-              className="mt-3 w-full rounded-2xl border border-white/10 py-3 text-sm font-semibold uppercase tracking-[0.35em] text-slate-300 transition hover:border-primary hover:text-white"
+              className="mt-3 w-full rounded-2xl border border-white/10 py-3 min-h-[48px] text-sm font-semibold uppercase tracking-[0.35em] text-slate-300 transition hover:border-primary hover:text-white active:scale-95 touch-manipulation"
             >
               Back to Register
             </button>

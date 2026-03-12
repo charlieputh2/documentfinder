@@ -1,9 +1,34 @@
+import { useState, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
+import { Download, Eye, FileDown, ChevronDown } from 'lucide-react';
 import DocumentCard from './DocumentCard.jsx';
 import { formatFileSize, getFormatLabel } from '../../utils/documents.js';
+import { getDocumentTypeConfig } from '../../constants/documentTypes.js';
 import { SkeletonCard, SkeletonTable } from '../common/Skeleton.jsx';
+import { exportToCSV, exportToPDF, exportToWord } from '../../utils/exportDocuments.js';
 
 const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview, onDownload }) => {
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const exportMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleExport = (format) => {
+    setShowExportMenu(false);
+    if (!documents.length) return;
+    if (format === 'csv') exportToCSV(documents);
+    else if (format === 'pdf') exportToPDF(documents);
+    else if (format === 'word') exportToWord(documents);
+  };
+
   const handlePrev = () => {
     if (pagination.page > 1) {
       onPageChange(pagination.page - 1);
@@ -23,8 +48,52 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
           <p className="text-2xs uppercase tracking-[0.35em] text-primary/70 sm:text-xs">Documents</p>
           <h3 className="font-heading text-lg text-white sm:text-2xl">Operational library</h3>
         </div>
-        <div className="text-2xs text-slate-400 sm:text-sm md:block">
-          {pagination.total} results · Page {pagination.page} of {pagination.pages}
+        <div className="flex items-center gap-3">
+          <div className="text-2xs text-slate-400 sm:text-sm">
+            {pagination.total} results · Page {pagination.page} of {pagination.pages}
+          </div>
+          <div className="relative" ref={exportMenuRef}>
+            <button
+              type="button"
+              onClick={() => setShowExportMenu((prev) => !prev)}
+              disabled={!documents.length}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-2 sm:text-xs"
+              aria-haspopup="true"
+              aria-expanded={showExportMenu}
+            >
+              <FileDown className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Export</span>
+              <ChevronDown className="h-3 w-3" />
+            </button>
+            {showExportMenu && (
+              <div className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-white/10 bg-[#1a1b22] p-1.5 shadow-xl shadow-black/50">
+                <button
+                  type="button"
+                  onClick={() => handleExport('csv')}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation"
+                >
+                  <span className="text-xs text-emerald-400">CSV</span>
+                  <span>Excel / Spreadsheet</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport('pdf')}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation"
+                >
+                  <span className="text-xs text-red-400">PDF</span>
+                  <span>PDF Document</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport('word')}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation"
+                >
+                  <span className="text-xs text-blue-400">DOC</span>
+                  <span>Word Document</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -58,42 +127,54 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
                 </td>
               </tr>
             ) : (
-              documents.map((doc) => (
-                <tr key={doc.id} className="hover:bg-white/5">
-                  <td className="py-4">
-                    <p className="font-semibold text-white">{doc.title}</p>
-                    <p className="text-xs text-slate-500">v{doc.version}</p>
-                  </td>
-                  <td className="py-4 capitalize">{doc.documentType}</td>
-                  <td className="py-4">{doc.category}</td>
-                  <td className="py-4 text-sm text-slate-400">
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-white">{getFormatLabel(doc.fileType)}</span>
-                      <span>{formatFileSize(doc.fileSize)}</span>
-                    </div>
-                  </td>
-                  <td className="py-4">{doc.author?.name ?? 'Unknown'}</td>
-                  <td className="py-4">{dayjs(doc.updatedAt).format('DD MMM YYYY')}</td>
-                  <td className="py-4 text-right">
-                    <div className="flex flex-wrap justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => onPreview?.(doc)}
-                        className="rounded-full border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10"
-                      >
-                        Preview
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDownload?.(doc)}
-                        className="rounded-full border border-primary/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white"
-                      >
-                        Download
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              documents.map((doc) => {
+                const typeConfig = getDocumentTypeConfig(doc.documentType);
+                return (
+                  <tr key={doc.id} className="hover:bg-white/5 transition-colors">
+                    <td className="py-4">
+                      <p className="font-semibold text-white">{doc.title}</p>
+                      <p className="text-xs text-slate-500">v{doc.version}</p>
+                    </td>
+                    <td className="py-4">
+                      {typeConfig && (
+                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                          <span>{typeConfig.icon}</span>
+                          <span>{typeConfig.code}</span>
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4">{doc.category}</td>
+                    <td className="py-4 text-sm text-slate-400">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-white">{getFormatLabel(doc.fileType)}</span>
+                        <span>{formatFileSize(doc.fileSize)}</span>
+                      </div>
+                    </td>
+                    <td className="py-4">{doc.author?.name ?? 'Unknown'}</td>
+                    <td className="py-4">{dayjs(doc.updatedAt).format('DD MMM YYYY')}</td>
+                    <td className="py-4 text-right">
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onPreview?.(doc)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 active:scale-95"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span>Preview</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDownload?.(doc)}
+                          className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white active:scale-95"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          <span>Download</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -134,7 +215,7 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
             type="button"
             onClick={handlePrev}
             disabled={pagination.page === 1}
-            className="flex-1 rounded-lg border border-white/10 px-4 py-2 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 active:scale-95 touch-manipulation tap-highlight sm:flex-initial sm:rounded-full sm:px-5 sm:text-xs"
+            className="flex-1 rounded-lg border border-white/10 px-4 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 active:scale-95 touch-manipulation tap-highlight sm:flex-initial sm:rounded-full sm:px-5 sm:min-h-0 sm:py-2 sm:text-xs"
           >
             Prev
           </button>
@@ -142,7 +223,7 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
             type="button"
             onClick={handleNext}
             disabled={pagination.page === pagination.pages}
-            className="flex-1 rounded-lg border border-white/10 px-4 py-2 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 active:scale-95 touch-manipulation tap-highlight sm:flex-initial sm:rounded-full sm:px-5 sm:text-xs"
+            className="flex-1 rounded-lg border border-white/10 px-4 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 active:scale-95 touch-manipulation tap-highlight sm:flex-initial sm:rounded-full sm:px-5 sm:min-h-0 sm:py-2 sm:text-xs"
           >
             Next
           </button>

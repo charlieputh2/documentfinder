@@ -1,29 +1,13 @@
 import dayjs from 'dayjs';
+import { Download, Eye } from 'lucide-react';
 import { formatFileSize, getFormatLabel } from '../../utils/documents.js';
-
-const badgeClass = (type) => {
-  switch (type?.toLowerCase()) {
-    case 'manufacturing':
-      return 'bg-primary/10 text-primary border-primary/30';
-    case 'quality':
-      return 'bg-emerald-400/10 text-emerald-300 border-emerald-300/30';
-    default:
-      return 'bg-white/5 text-white border-white/10';
-  }
-};
-
-const getTypeLabel = (type) => {
-  if (!type) return 'Instruction';
-  const normalized = type.toLowerCase();
-  if (normalized === 'manufacturing') return 'Manufacturing';
-  if (normalized === 'quality') return 'Quality';
-  return type;
-};
+import { getDocumentTypeConfig } from '../../constants/documentTypes.js';
 
 const DocumentCard = ({ document, onPreview, onDownload }) => {
   const tags = Array.isArray(document.tags) ? document.tags : [];
   const formatLabel = getFormatLabel(document.fileType);
   const fileSize = formatFileSize(document.fileSize);
+  const typeConfig = getDocumentTypeConfig(document.documentType);
 
   const handlePreviewClick = () => {
     onPreview?.(document);
@@ -42,9 +26,13 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
         </div>
 
         <div>
-          <div className={`inline-flex items-center rounded-full border px-2 py-0.5 text-2xs font-semibold sm:px-3 sm:py-1 sm:text-xs ${badgeClass(document.documentType)}`}>
-            {getTypeLabel(document.documentType)}
-          </div>
+          {typeConfig && (
+            <div className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-2xs font-semibold sm:px-3 sm:py-1 sm:text-xs ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border} transition-all ${typeConfig.color.hoverBg}`}>
+              <span className="text-sm sm:text-base">{typeConfig.icon}</span>
+              <span>{typeConfig.code}</span>
+              <span className="hidden sm:inline">- {typeConfig.name}</span>
+            </div>
+          )}
           <h4 className="mt-1.5 line-clamp-2 font-heading text-base text-white sm:mt-3 sm:text-xl">{document.title}</h4>
           <p className="line-clamp-2 text-2xs text-slate-400 sm:text-sm">{document.description || 'No description provided.'}</p>
         </div>
@@ -87,16 +75,18 @@ const DocumentCard = ({ document, onPreview, onDownload }) => {
           <button
             type="button"
             onClick={handlePreviewClick}
-            className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:text-xs touch-manipulation tap-highlight"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-white/10 px-3 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:min-h-0 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
           >
-            Preview
+            <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>Preview</span>
           </button>
           <button
             type="button"
             onClick={handleDownloadClick}
-            className="flex-1 rounded-lg border border-primary/50 px-3 py-2 text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:text-xs touch-manipulation tap-highlight"
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-primary/50 px-3 py-2.5 min-h-[44px] text-2xs font-semibold uppercase tracking-wide text-primary transition hover:bg-primary hover:text-white active:scale-95 sm:flex-initial sm:rounded-full sm:px-4 sm:min-h-0 sm:py-2 sm:text-xs touch-manipulation tap-highlight"
           >
-            Download
+            <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>Download</span>
           </button>
         </div>
       </div>

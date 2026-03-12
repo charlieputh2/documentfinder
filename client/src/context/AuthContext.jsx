@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem(TOKEN_KEY);
     if (storedToken) {
       setAuthToken(storedToken);
-      fetchProfile(storedToken);
+      fetchProfile();
     } else {
       setLoading(false);
     }

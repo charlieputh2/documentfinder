@@ -6,14 +6,17 @@ import { Toaster } from 'react-hot-toast';
 import App from './App.jsx';
 import './index.css';
 import { AuthProvider } from './context/AuthContext.jsx';
+import ErrorBoundary from './components/common/ErrorBoundary.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-        <Toaster position="top-right" toastOptions={{ className: 'font-body' }} />
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <App />
+          <Toaster position="top-right" toastOptions={{ className: 'font-body' }} />
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 );

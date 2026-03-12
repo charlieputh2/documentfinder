@@ -116,14 +116,17 @@ const Dashboard = () => {
     }
   };
 
-  // Initial load
+  // Initial load + periodic refresh
   useEffect(() => {
     fetchOverview();
     fetchReferenceData();
+    const interval = setInterval(fetchOverview, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  // When filters change, fetch documents from page 1
+  // When filters change, reset to page 1 and fetch
   useEffect(() => {
+    setPagination((prev) => ({ ...prev, page: 1 }));
     fetchDocuments(1, filters);
   }, [filters.search, filters.documentType, filters.category, filters.tag, filters.fileType]);
 
@@ -133,13 +136,6 @@ const Dashboard = () => {
       fetchDocuments(pagination.page, filters);
     }
   }, [pagination.page]);
-
-  // Real-time updates - fetch overview every 30 seconds
-  useEffect(() => {
-    fetchOverview();
-    const interval = setInterval(fetchOverview, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleFilterChange = (updates) => {
     setFilters((prev) => ({ ...prev, ...updates }));
@@ -203,9 +199,9 @@ const Dashboard = () => {
       <div className="lg:hidden">
         <button
           onClick={() => setShowMobileFilters(!showMobileFilters)}
-          className="fixed bottom-4 right-4 z-40 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-lg touch-manipulation tap-highlight active:scale-95 transition-transform"
+          className="fixed bottom-4 left-4 z-40 rounded-full bg-primary/90 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-primary/30 backdrop-blur-sm touch-manipulation tap-highlight active:scale-95 transition-all sm:text-sm"
         >
-          {showMobileFilters ? 'Hide Filters' : 'Show Filters'}
+          {showMobileFilters ? 'Hide Filters' : 'Filters'}
         </button>
       </div>
 
@@ -216,7 +212,7 @@ const Dashboard = () => {
 
       {/* Analytics Dashboard - Full Width - Responsive */}
       <div className="animate-fadeIn">
-        <AnalyticsDashboard overview={overview} loading={loadingOverview} />
+        <AnalyticsDashboard overview={overview} loading={loadingOverview} documents={documents} />
       </div>
 
       {/* Main Content - Responsive Grid - Mobile First */}

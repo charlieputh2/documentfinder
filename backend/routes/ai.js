@@ -79,10 +79,11 @@ RESPONSE GUIDELINES:
 // Helper function to get system statistics
 const getSystemStats = async () => {
   try {
-    const totalDocs = await Document.count();
+    const totalDocs = await Document.count({ where: { isActive: true } });
     const docsByType = await Document.findAll({
-      attributes: ['type', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
-      group: ['type'],
+      attributes: ['documentType', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+      where: { isActive: true },
+      group: ['documentType'],
       raw: true
     });
     
@@ -116,7 +117,7 @@ router.post('/chat', authenticate, async (req, res) => {
     const systemContext = `
 Current System Statistics:
 - Total Documents: ${stats.totalDocuments}
-- Documents by Type: ${stats.documentsByType.map(d => `${d.type}: ${d.count}`).join(', ') || 'No documents yet'}
+- Documents by Type: ${stats.documentsByType.map(d => `${d.documentType}: ${d.count}`).join(', ') || 'No documents yet'}
 - User Role: ${context?.userRole || 'User'}
 - Active Features: ${context?.features?.join(', ') || 'All features'}`;
 

@@ -15,7 +15,7 @@ export default (sequelize) => {
       type: DataTypes.TEXT
     },
     documentType: {
-      type: DataTypes.ENUM('manufacturing', 'quality'),
+      type: DataTypes.ENUM('MN', 'MI', 'QI', 'QAN', 'VA', 'PCA', 'manufacturing', 'quality'),
       allowNull: false
     },
     category: {
