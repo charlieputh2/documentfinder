@@ -126,6 +126,17 @@ router.post(
         return res.status(400).json({ message: 'Document file is required' });
       }
 
+      const { title, documentType, category } = req.body;
+      if (!title || !title.trim()) {
+        return res.status(400).json({ message: 'Title is required' });
+      }
+      if (!documentType) {
+        return res.status(400).json({ message: 'Document type is required' });
+      }
+      if (!category || !category.trim()) {
+        return res.status(400).json({ message: 'Category is required' });
+      }
+
       const uploadResult = await cloudinary.uploader.upload(req.file.path, {
         folder: 'document-finder',
         resource_type: 'auto'

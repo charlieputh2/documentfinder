@@ -157,7 +157,7 @@ const bootstrap = async () => {
     console.log('✅ Database connection established');
     // In production, sync without alter to avoid modifying existing tables
     // Use migrations for schema changes in production
-    await sequelize.sync(isProduction ? {} : { alter: true });
+    await sequelize.sync({ alter: true });
     await seedAdminUser();
     server.listen(PORT, () => {
       console.log(`🚀 Server listening on port ${PORT}`);

@@ -53,12 +53,18 @@ export default (sequelize) => {
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true
+    },
+    createdBy: {
+      type: DataTypes.UUID,
+      allowNull: true
     }
   }, {
     indexes: [
       { fields: ['title'] },
       { fields: ['category'] },
-      { fields: ['documentType'] }
+      { fields: ['documentType'] },
+      { fields: ['createdBy'] },
+      { fields: ['isActive'] }
     ]
   });
 

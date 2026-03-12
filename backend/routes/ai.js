@@ -20,7 +20,7 @@ const initializeGemini = async () => {
     const module = await import('@google/generative-ai');
     GoogleGenerativeAI = module.GoogleGenerativeAI;
     genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    console.log('✅ Gemini API initialized with key:', process.env.GEMINI_API_KEY.substring(0, 10) + '...');
+    console.log('✅ Gemini API initialized successfully');
     return genAI;
   } catch (error) {
     console.error('❌ Failed to initialize Gemini API:');
