@@ -125,42 +125,73 @@ const seedAdminUser = async () => {
       where: { email: 'melanie@admin.com' }
     });
 
-    if (existingAdmin) {
-      console.log('✅ Admin user already exists');
-      return;
-    }
+    if (!existingAdmin) {
+      await User.create({
+        firstName: 'Melanie',
+        middleName: 'Chavaria',
+        lastName: 'Birmingham',
+        suffix: '',
+        email: 'melanie@admin.com',
+        password: "Ma'am123",
+        role: 'admin',
+        isVerified: true,
+        photoUrl: null,
+        photoPublicId: null
+      });
 
-    await User.create({
-      firstName: 'Melanie',
-      middleName: 'Chavaria',
-      lastName: 'Birmingham',
-      suffix: '',
-      email: 'melanie@admin.com',
-      password: "Ma'am123",
-      role: 'admin',
-      isVerified: true,
-      photoUrl: null,
-      photoPublicId: null
+      console.log('[OK] Admin user created successfully');
+      console.log('  Email: melanie@admin.com');
+      console.log("  Password: Ma'am123");
+    } else {
+      console.log('[OK] Admin user already exists');
+    }
+  } catch (error) {
+    console.error('[WARN] Error seeding admin user:', error.message);
+  }
+};
+
+const seedDefaultUser = async () => {
+  try {
+    const existingUser = await User.findOne({
+      where: { email: 'user@user.com' }
     });
 
-    console.log('✅ Admin user created successfully');
-    console.log('📧 Email: melanie@admin.com');
-    console.log('🔐 Password: Ma\'am123');
+    if (!existingUser) {
+      await User.create({
+        firstName: 'Default',
+        middleName: '',
+        lastName: 'User',
+        suffix: '',
+        email: 'user@user.com',
+        password: 'user',
+        role: 'user',
+        isVerified: true,
+        photoUrl: null,
+        photoPublicId: null
+      });
+
+      console.log('[OK] Default user created successfully');
+      console.log('  Email: user@user.com');
+      console.log('  Password: user');
+    } else {
+      console.log('[OK] Default user already exists');
+    }
   } catch (error) {
-    console.error('⚠️ Error seeding admin user:', error.message);
+    console.error('[WARN] Error seeding default user:', error.message);
   }
 };
 
 const bootstrap = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established');
+    console.log('[OK] Database connection established');
     // In production, sync without alter to avoid modifying existing tables
     // Use migrations for schema changes in production
     await sequelize.sync({ alter: true });
     await seedAdminUser();
+    await seedDefaultUser();
     server.listen(PORT, () => {
-      console.log(`🚀 Server listening on port ${PORT}`);
+      console.log(`[OK] Server listening on port ${PORT}`);
     });
   } catch (error) {
     console.error('Unable to start server:', error);

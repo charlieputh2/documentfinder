@@ -8,11 +8,21 @@ const getGreeting = () => {
 };
 
 const WelcomeBanner = ({ overview, onOpenSearch }) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const firstName = user?.firstName || 'there';
   const totalDocs = overview?.totals?.totalDocuments || 0;
   const storage = overview?.storageBytes || 0;
   const storageMB = (storage / (1024 * 1024)).toFixed(1);
+
+  const getSubtitle = () => {
+    if (totalDocs > 0) {
+      return `${totalDocs} document${totalDocs !== 1 ? 's' : ''} in your vault · ${storageMB} MB storage used`;
+    }
+    if (isAdmin) {
+      return 'Your vault is empty. Start by uploading documents or loading sample data.';
+    }
+    return 'No documents available yet. Contact an admin to upload documents.';
+  };
 
   return (
     <div className="rounded-2xl border border-white/5 bg-gradient-to-r from-primary/10 via-[#15161b] to-[#15161b] p-4 sm:p-6">
@@ -22,9 +32,7 @@ const WelcomeBanner = ({ overview, onOpenSearch }) => {
             {getGreeting()}, <span className="text-primary">{firstName}</span>
           </h1>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">
-            {totalDocs > 0
-              ? `${totalDocs} document${totalDocs !== 1 ? 's' : ''} in your vault · ${storageMB} MB storage used`
-              : 'Your vault is empty. Start by uploading documents or loading sample data.'}
+            {getSubtitle()}
           </p>
         </div>
         <button

@@ -6,42 +6,68 @@ dotenv.config();
 const seedAdmin = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established');
+    console.log('[OK] Database connection established');
 
-    // Check if admin already exists
+    // Seed admin account
     const existingAdmin = await User.findOne({
       where: { email: 'melanie@admin.com' }
     });
 
     if (existingAdmin) {
-      console.log('⚠️ Admin account already exists');
-      process.exit(0);
+      console.log('[OK] Admin account already exists');
+    } else {
+      await User.create({
+        firstName: 'Melanie',
+        middleName: 'Chavaria',
+        lastName: 'Birmingham',
+        suffix: '',
+        email: 'melanie@admin.com',
+        password: "Ma'am123",
+        role: 'admin',
+        isVerified: true,
+        photoUrl: null,
+        photoPublicId: null
+      });
+
+      console.log('[OK] Admin account created successfully!');
+      console.log('Email: melanie@admin.com');
+      console.log("Password: Ma'am123");
+      console.log('Name: Melanie Chavaria Birmingham');
+      console.log('Role: admin');
+      console.log('[OK] Verified: Yes');
     }
 
-    // Create admin account
-    const admin = await User.create({
-      firstName: 'Melanie',
-      middleName: 'Chavaria',
-      lastName: 'Birmingham',
-      suffix: '',
-      email: 'melanie@admin.com',
-      password: "Ma'am123",
-      role: 'admin',
-      isVerified: true,
-      photoUrl: 'https://via.placeholder.com/150?text=Melanie',
-      photoPublicId: 'placeholder-admin'
+    // Seed default user account
+    const existingUser = await User.findOne({
+      where: { email: 'user@user.com' }
     });
 
-    console.log('✅ Admin account created successfully!');
-    console.log('📧 Email: melanie@admin.com');
-    console.log('🔐 Password: Ma\'am123');
-    console.log('👤 Name: Melanie Chavaria Birmingham');
-    console.log('📊 Role: admin');
-    console.log('✔️ Verified: Yes');
+    if (existingUser) {
+      console.log('[OK] Default user account already exists');
+    } else {
+      await User.create({
+        firstName: 'Default',
+        middleName: '',
+        lastName: 'User',
+        suffix: '',
+        email: 'user@user.com',
+        password: 'user',
+        role: 'user',
+        isVerified: true,
+        photoUrl: null,
+        photoPublicId: null
+      });
+
+      console.log('[OK] Default user account created!');
+      console.log('Email: user@user.com');
+      console.log('Password: user');
+      console.log('Name: Default User');
+      console.log('Role: user');
+    }
 
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error creating admin account:', error.message);
+    console.error('[ERROR] Error seeding accounts:', error.message);
     process.exit(1);
   }
 };
