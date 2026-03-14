@@ -34,6 +34,7 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
       setIsSearching(false);
     }, 500);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
 
   // Active filter chips for visual feedback
@@ -43,14 +44,14 @@ const DocumentFilters = ({ filters, onChange, onReset, categories = [], tags = [
     activeFilters.push({ key: 'documentType', label: config?.code || filters.documentType, color: config?.color?.text || 'text-white' });
   }
   if (filters.category) {
-    activeFilters.push({ key: 'category', label: filters.category, color: 'text-blue-300' });
+    activeFilters.push({ key: 'category', label: filters.category, color: 'text-slate-300' });
   }
   if (filters.tag) {
-    activeFilters.push({ key: 'tag', label: `#${filters.tag}`, color: 'text-purple-300' });
+    activeFilters.push({ key: 'tag', label: `#${filters.tag}`, color: 'text-slate-300' });
   }
   if (filters.fileType) {
     const match = FILE_TYPE_OPTIONS.find(o => o.value === filters.fileType);
-    activeFilters.push({ key: 'fileType', label: match?.label || 'Custom', color: 'text-emerald-300' });
+    activeFilters.push({ key: 'fileType', label: match?.label || 'Custom', color: 'text-slate-300' });
   }
 
   const removeFilter = (key) => {

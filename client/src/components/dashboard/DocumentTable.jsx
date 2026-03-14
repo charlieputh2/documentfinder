@@ -132,7 +132,7 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
               type="button"
               onClick={() => setShowImportMenu((prev) => !prev)}
               disabled={importing}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-emerald-400 hover:bg-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-2 sm:text-xs"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-2xs font-semibold uppercase tracking-wide text-white transition hover:border-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-40 sm:px-4 sm:py-2 sm:text-xs"
               aria-haspopup="true"
               aria-expanded={showImportMenu}
             >
@@ -147,11 +147,11 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
             {showImportMenu && (
               <div className="absolute right-0 z-30 mt-2 w-52 rounded-xl border border-white/10 bg-[#1a1b22] p-1.5 shadow-xl shadow-black/50">
                 <button type="button" onClick={() => { csvInputRef.current?.click(); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation">
-                  <span className="text-xs text-emerald-400">CSV</span>
+                  <span className="text-xs text-primary">CSV</span>
                   <span>Import from CSV</span>
                 </button>
                 <button type="button" onClick={() => { bulkInputRef.current?.click(); }} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation">
-                  <span className="text-xs text-blue-400">Files</span>
+                  <span className="text-xs text-slate-300">Files</span>
                   <span>Bulk File Upload</span>
                 </button>
                 <div className="border-t border-white/5 mt-1 pt-1">
@@ -185,15 +185,15 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
             {showExportMenu && (
               <div className="absolute right-0 z-30 mt-2 w-44 rounded-xl border border-white/10 bg-[#1a1b22] p-1.5 shadow-xl shadow-black/50">
                 <button type="button" onClick={() => handleExport('csv')} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation">
-                  <span className="text-xs text-emerald-400">CSV</span>
+                  <span className="text-xs text-primary">CSV</span>
                   <span>Excel / Spreadsheet</span>
                 </button>
                 <button type="button" onClick={() => handleExport('pdf')} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation">
-                  <span className="text-xs text-red-400">PDF</span>
+                  <span className="text-xs text-slate-300">PDF</span>
                   <span>PDF Document</span>
                 </button>
                 <button type="button" onClick={() => handleExport('word')} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-slate-300 transition hover:bg-white/5 hover:text-white active:bg-white/10 touch-manipulation">
-                  <span className="text-xs text-blue-400">DOC</span>
+                  <span className="text-xs text-slate-300">DOC</span>
                   <span>Word Document</span>
                 </button>
               </div>
@@ -243,9 +243,8 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
                     </td>
                     <td className="py-4">
                       {typeConfig && (
-                        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
-                          <span>{typeConfig.icon}</span>
-                          <span>{typeConfig.code}</span>
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                          {typeConfig.code}
                         </span>
                       )}
                     </td>
@@ -284,8 +283,8 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
                             onClick={() => onToggleFavorite(doc.id)}
                             className={`inline-flex items-center justify-center rounded-full border p-1.5 transition active:scale-95 ${
                               isFavorite?.(doc.id)
-                                ? 'border-amber-400/30 bg-amber-500/10 text-amber-400'
-                                : 'border-white/10 text-slate-400 hover:border-amber-400/30 hover:bg-amber-500/10 hover:text-amber-400'
+                                ? 'border-primary/30 bg-primary/10 text-primary'
+                                : 'border-white/10 text-slate-400 hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
                             }`}
                             title={isFavorite?.(doc.id) ? 'Remove from favorites' : 'Add to favorites'}
                           >
@@ -296,7 +295,7 @@ const DocumentTable = ({ documents, loading, pagination, onPageChange, onPreview
                           <button
                             type="button"
                             onClick={() => onEdit(doc)}
-                            className="inline-flex items-center justify-center rounded-full border border-white/10 p-1.5 text-slate-400 transition hover:border-blue-400/30 hover:bg-blue-500/10 hover:text-blue-400 active:scale-95 opacity-0 group-hover:opacity-100"
+                            className="inline-flex items-center justify-center rounded-full border border-white/10 p-1.5 text-slate-400 transition hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-95 opacity-0 group-hover:opacity-100"
                             title="Edit"
                           >
                             <Pencil className="h-3.5 w-3.5" />

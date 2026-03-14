@@ -5,11 +5,11 @@ const FavoritesBar = ({ favorites = [], onPreview, onDownload, onToggleFavorite 
   if (favorites.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-amber-500/10 bg-gradient-to-r from-amber-500/5 via-[#15161b] to-[#15161b] p-4 sm:p-6">
+    <section className="rounded-2xl border border-white/5 bg-[#15161b] p-4 sm:p-6">
       <div className="mb-3 flex items-center gap-2">
-        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+        <Star className="h-4 w-4 text-primary fill-primary" />
         <div>
-          <p className="text-xs uppercase tracking-[0.35em] text-amber-400/70">Favorites</p>
+          <p className="text-xs uppercase tracking-[0.35em] text-primary/70">Favorites</p>
           <h3 className="font-heading text-base text-white sm:text-lg">{favorites.length} starred document{favorites.length !== 1 ? 's' : ''}</h3>
         </div>
       </div>
@@ -20,23 +20,22 @@ const FavoritesBar = ({ favorites = [], onPreview, onDownload, onToggleFavorite 
           return (
             <div
               key={doc.id}
-              className="group flex min-w-[220px] max-w-[260px] shrink-0 flex-col justify-between rounded-xl border border-white/5 bg-white/[0.03] p-3 transition hover:border-amber-400/20 hover:bg-white/[0.06] sm:min-w-[250px]"
+              className="group flex min-w-[220px] max-w-[260px] shrink-0 flex-col justify-between rounded-xl border border-white/5 bg-white/[0.03] p-3 transition hover:border-primary/20 hover:bg-white/[0.06] sm:min-w-[250px]"
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
                   {typeConfig && (
-                    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
-                      <span>{typeConfig.icon}</span>
-                      <span>{typeConfig.code}</span>
+                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                      {typeConfig.code}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => onToggleFavorite?.(doc.id)}
-                    className="rounded-full p-1 text-amber-400 transition hover:bg-amber-400/10 active:scale-90"
+                    className="rounded-full p-1 text-primary transition hover:bg-primary/10 active:scale-90"
                     title="Remove from favorites"
                   >
-                    <Star className="h-3.5 w-3.5 fill-amber-400" />
+                    <Star className="h-3.5 w-3.5 fill-primary" />
                   </button>
                 </div>
                 <p className="mt-2 line-clamp-2 text-sm font-semibold text-white">{doc.title}</p>

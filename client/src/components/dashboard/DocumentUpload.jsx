@@ -165,7 +165,7 @@ const DocumentUpload = ({ onUploaded, categorySuggestions = [] }) => {
             dragActive
               ? 'border-primary bg-primary/10 scale-[1.02]'
               : file
-              ? 'border-emerald-400/30 bg-emerald-500/5'
+              ? 'border-primary/30 bg-primary/5'
               : 'border-white/10 bg-black/20 hover:border-white/20 hover:bg-black/30'
           }`}
           onDragEnter={handleDrag}
@@ -184,7 +184,7 @@ const DocumentUpload = ({ onUploaded, categorySuggestions = [] }) => {
 
           {file ? (
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <FileText className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1 text-left">
@@ -318,7 +318,7 @@ const DocumentUpload = ({ onUploaded, categorySuggestions = [] }) => {
           disabled={uploading || !file}
           className={`flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold uppercase tracking-wide text-white shadow-glow transition active:scale-95 disabled:cursor-not-allowed sm:rounded-xl sm:py-3 sm:text-sm touch-manipulation tap-highlight ${
             uploadSuccess
-              ? 'bg-emerald-500 shadow-emerald-500/30'
+              ? 'bg-primary shadow-primary/30'
               : 'bg-primary hover:bg-primary/90 disabled:opacity-60'
           }`}
         >

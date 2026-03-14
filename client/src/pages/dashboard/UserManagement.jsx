@@ -20,6 +20,9 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [addForm, setAddForm] = useState({ firstName: '', lastName: '', email: '', password: '', role: 'user' });
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -37,6 +40,25 @@ const UserManagement = () => {
       toast.error('Failed to load users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!addForm.firstName || !addForm.lastName || !addForm.email || !addForm.password) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    setAdding(true);
+    try {
+      await api.post('/users', addForm);
+      toast.success('User created successfully');
+      setShowAddUser(false);
+      setAddForm({ firstName: '', lastName: '', email: '', password: '', role: 'user' });
+      fetchUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to create user');
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -78,7 +100,7 @@ const UserManagement = () => {
       html: `<p style="color:#94a3b8">${u.isActive ? 'Deactivate' : 'Reactivate'} <strong style="color:#fff">${u.name}</strong>?</p>`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: u.isActive ? '#ef4444' : '#22c55e',
+      confirmButtonColor: u.isActive ? '#ef4444' : '#e82127',
       cancelButtonColor: '#374151',
       confirmButtonText: u.isActive ? 'Deactivate' : 'Reactivate',
       background: '#1a1b22',
@@ -142,12 +164,21 @@ const UserManagement = () => {
           </div>
           <p className="mt-1 text-xs text-slate-400 sm:text-sm">Manage user accounts, roles, and permissions</p>
         </div>
-        <button
-          onClick={() => navigate('/')}
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10 active:scale-95 touch-manipulation sm:rounded-2xl sm:px-6 sm:text-sm"
-        >
-          Back to Dashboard
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowAddUser(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white transition hover:bg-primary/90 active:scale-95 touch-manipulation sm:rounded-2xl sm:px-6 sm:text-sm"
+          >
+            <UserPlus className="h-4 w-4" />
+            Add User
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10 active:scale-95 touch-manipulation sm:rounded-2xl sm:px-6 sm:text-sm"
+          >
+            Back to Dashboard
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -158,7 +189,7 @@ const UserManagement = () => {
         </div>
         <div className="rounded-xl border border-white/5 bg-[#15161b] p-3 sm:rounded-2xl sm:p-4">
           <p className="text-2xs uppercase tracking-[0.3em] text-slate-500 sm:text-xs">Active</p>
-          <p className="mt-1 font-heading text-xl text-emerald-400 sm:text-2xl">{activeCount}</p>
+          <p className="mt-1 font-heading text-xl text-white sm:text-2xl">{activeCount}</p>
         </div>
         <div className="rounded-xl border border-white/5 bg-[#15161b] p-3 sm:rounded-2xl sm:p-4">
           <p className="text-2xs uppercase tracking-[0.3em] text-slate-500 sm:text-xs">Admins</p>
@@ -244,10 +275,10 @@ const UserManagement = () => {
                       <td className="px-5 py-4">
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
                           u.isActive !== false
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-slate-500/10 text-slate-300 border border-slate-500/20'
                             : 'bg-red-500/10 text-red-400 border border-red-500/20'
                         }`}>
-                          <span className={`h-1.5 w-1.5 rounded-full ${u.isActive !== false ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                          <span className={`h-1.5 w-1.5 rounded-full ${u.isActive !== false ? 'bg-slate-300' : 'bg-red-400'}`} />
                           {u.isActive !== false ? 'Active' : 'Inactive'}
                         </span>
                       </td>
@@ -258,7 +289,7 @@ const UserManagement = () => {
                         <div className="flex justify-end gap-1.5">
                           <button
                             onClick={() => handleEditUser(u)}
-                            className="rounded-lg p-2 text-slate-400 transition hover:bg-blue-500/10 hover:text-blue-400 active:scale-95 touch-manipulation"
+                            className="rounded-lg p-2 text-slate-400 transition hover:bg-primary/10 hover:text-primary active:scale-95 touch-manipulation"
                             title="Edit user"
                           >
                             <Pencil className="h-4 w-4" />
@@ -295,7 +326,7 @@ const UserManagement = () => {
                         <p className="text-2xs text-slate-400">{u.email}</p>
                       </div>
                     </div>
-                    <span className={`inline-flex h-2 w-2 rounded-full ${u.isActive !== false ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                    <span className={`inline-flex h-2 w-2 rounded-full ${u.isActive !== false ? 'bg-slate-300' : 'bg-red-400'}`} />
                   </div>
 
                   <div className="flex items-center justify-between mt-3">
@@ -312,7 +343,7 @@ const UserManagement = () => {
                     <div className="flex gap-1">
                       <button
                         onClick={() => handleEditUser(u)}
-                        className="rounded-lg p-2 text-slate-400 hover:bg-blue-500/10 hover:text-blue-400 touch-manipulation"
+                        className="rounded-lg p-2 text-slate-400 hover:bg-primary/10 hover:text-primary touch-manipulation"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -399,6 +430,91 @@ const UserManagement = () => {
                 className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-60 touch-manipulation active:scale-95"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowAddUser(false)} />
+          <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[#0e0f13] p-5 text-white shadow-2xl sm:p-6">
+            <h3 className="font-heading text-xl text-white mb-4">Add New User</h3>
+
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <label className="block space-y-1 text-sm">
+                  <span className="text-slate-300">First Name *</span>
+                  <input
+                    type="text"
+                    value={addForm.firstName}
+                    onChange={(e) => setAddForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    placeholder="First name"
+                    className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-primary focus:outline-none"
+                  />
+                </label>
+                <label className="block space-y-1 text-sm">
+                  <span className="text-slate-300">Last Name *</span>
+                  <input
+                    type="text"
+                    value={addForm.lastName}
+                    onChange={(e) => setAddForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    placeholder="Last name"
+                    className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-primary focus:outline-none"
+                  />
+                </label>
+              </div>
+
+              <label className="block space-y-1 text-sm">
+                <span className="text-slate-300">Email *</span>
+                <input
+                  type="email"
+                  value={addForm.email}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="user@example.com"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-primary focus:outline-none"
+                />
+              </label>
+
+              <label className="block space-y-1 text-sm">
+                <span className="text-slate-300">Password *</span>
+                <input
+                  type="password"
+                  value={addForm.password}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Minimum 6 characters"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-primary focus:outline-none"
+                />
+              </label>
+
+              <label className="block space-y-1 text-sm">
+                <span className="text-slate-300">Role</span>
+                <select
+                  value={addForm.role}
+                  onChange={(e) => setAddForm(prev => ({ ...prev, role: e.target.value }))}
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-2.5 text-sm text-white focus:border-primary focus:outline-none"
+                >
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setShowAddUser(false)}
+                className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm text-slate-400 transition hover:text-white touch-manipulation active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddUser}
+                disabled={adding}
+                className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:opacity-60 touch-manipulation active:scale-95"
+              >
+                {adding ? 'Creating...' : 'Create User'}
               </button>
             </div>
           </div>

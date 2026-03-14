@@ -1,7 +1,7 @@
 import express from 'express';
 import { Op } from 'sequelize';
 import { authenticate } from '../middleware/auth.js';
-import { Document, sequelize } from '../models/index.js';
+import { Document, User, sequelize } from '../models/index.js';
 
 const router = express.Router();
 
@@ -24,31 +24,31 @@ const initializeGemini = async () => {
   }
 };
 
-const SYSTEM_PROMPT = `You are the AI assistant for Tesla Manufacturing & Quality Vault — a document management system for manufacturing and quality control documents.
+const SYSTEM_PROMPT = `You are the Document Search Assistant for Tesla Manufacturing & Quality Vault. Your ONLY job is to help users find and understand documents stored in this system.
 
-DOCUMENT TYPES:
-- MN (Manufacturing Notice) — Notices about manufacturing process changes
-- MI (Manufacturing Instructions) — Step-by-step manufacturing procedures
-- QI (Quality Instructions) — Quality control and inspection procedures
-- QAN (Quality Alert Notice) — Urgent quality alerts and corrective actions
-- VA (Visual Aide) — Visual reference guides for assembly/inspection
-- PCA (Process Change Approval) — Formal process change requests and approvals
+IMPORTANT RULES:
+- You can ONLY answer questions about documents in the vault
+- If the user asks something unrelated to documents, politely redirect them: "I can only help with document searches. Try asking about specific documents, types, or topics in the vault."
+- Always base your answers on the ACTUAL documents provided in the context below
+- Never make up or guess document contents — only reference documents that appear in your search results
+- If no documents match, say so clearly
 
-SYSTEM FEATURES:
-- Upload documents (PDF, DOCX, DOC, images)
-- Preview, download, and search documents
-- Filter by type, category, tags
-- Real-time analytics dashboard
-- Role-based access (Admin, Manager, User)
-- Admins can seed sample data and manage users
+DOCUMENT TYPES IN THE SYSTEM:
+- [MN] Manufacturing Notice — Process change notices
+- [MI] Manufacturing Instructions — Step-by-step procedures
+- [QI] Quality Instructions — Quality control procedures
+- [QAN] Quality Alert Notice — Urgent quality alerts
+- [VA] Visual Aide — Visual reference guides
+- [PCA] Process Change Approval — Change request approvals
 
-RESPONSE FORMAT:
-- Use **bold** for emphasis and key terms
-- Use bullet points for lists
-- Use ### for section headers when needed
-- Keep answers concise but thorough
-- Reference specific document types by their codes (MN, MI, etc.)
-- When referencing documents from search results, mention their title and type`;
+HOW TO RESPOND:
+- List matching documents with their title, type, and category
+- Summarize what each document is about using its description and content
+- If documents have text content, use it to answer specific questions
+- Use **bold** for document titles and types
+- Use bullet points for document lists
+- Keep responses focused and concise
+- Always mention how many documents were found`;
 
 // Search documents relevant to the user's question
 const searchDocuments = async (query) => {
@@ -57,26 +57,38 @@ const searchDocuments = async (query) => {
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, '')
       .split(/\s+/)
-      .filter(w => w.length > 2 && !['the', 'and', 'for', 'how', 'what', 'can', 'you', 'about', 'this', 'that', 'with', 'are', 'from', 'have', 'does'].includes(w));
-
-    if (keywords.length === 0) return [];
+      .filter(w => w.length > 2 && !['the', 'and', 'for', 'how', 'what', 'can', 'you', 'about', 'this', 'that', 'with', 'are', 'from', 'have', 'does', 'show', 'find', 'search', 'look', 'get', 'list', 'all', 'any', 'give', 'tell'].includes(w));
 
     const typeMap = {
       manufacturing: ['MN', 'MI'],
       quality: ['QI', 'QAN'],
       notice: ['MN', 'QAN'],
+      notices: ['MN', 'QAN'],
       instruction: ['MI', 'QI'],
       instructions: ['MI', 'QI'],
       visual: ['VA'],
       aide: ['VA'],
       process: ['PCA'],
       change: ['PCA'],
-      approval: ['PCA']
+      approval: ['PCA'],
+      alert: ['QAN'],
+      alerts: ['QAN'],
+      inspection: ['QI'],
+      procedure: ['MI', 'QI'],
+      procedures: ['MI', 'QI'],
+      assembly: ['MI', 'VA'],
+      safety: ['QAN', 'QI'],
+      battery: ['MN', 'MI', 'QI'],
+      weld: ['MI', 'QI'],
+      welding: ['MI', 'QI'],
+      torque: ['MI', 'QI'],
+      paint: ['MI', 'QI'],
+      stamping: ['MI', 'QI']
     };
 
     // Check if query mentions specific document types
     const matchedTypes = [];
-    for (const kw of keywords) {
+    for (const kw of (keywords.length > 0 ? keywords : query.toLowerCase().split(/\s+/))) {
       if (typeMap[kw]) matchedTypes.push(...typeMap[kw]);
       if (['mn', 'mi', 'qi', 'qan', 'va', 'pca'].includes(kw)) matchedTypes.push(kw.toUpperCase());
     }
@@ -84,12 +96,15 @@ const searchDocuments = async (query) => {
     const where = { isActive: true };
     const orConditions = [];
 
-    // Search by title and description
-    for (const kw of keywords.slice(0, 5)) {
+    // Search by title, description, textContent, category, and tags
+    const searchKeywords = keywords.length > 0 ? keywords.slice(0, 6) : [];
+    for (const kw of searchKeywords) {
       orConditions.push(
         { title: { [Op.iLike]: `%${kw}%` } },
         { description: { [Op.iLike]: `%${kw}%` } },
-        { category: { [Op.iLike]: `%${kw}%` } }
+        { category: { [Op.iLike]: `%${kw}%` } },
+        { textContent: { [Op.iLike]: `%${kw}%` } },
+        { tags: { [Op.overlap]: [kw] } }
       );
     }
 
@@ -97,19 +112,29 @@ const searchDocuments = async (query) => {
       orConditions.push({ documentType: { [Op.in]: [...new Set(matchedTypes)] } });
     }
 
-    if (orConditions.length > 0) {
-      where[Op.or] = orConditions;
+    // If no keywords and no types, return recent documents
+    if (orConditions.length === 0) {
+      const docs = await Document.findAll({
+        where: { isActive: true },
+        attributes: ['id', 'title', 'documentType', 'category', 'description', 'tags', 'version', 'fileType', 'textContent', 'createdAt'],
+        include: [{ model: User, as: 'author', attributes: ['name'] }],
+        order: [['createdAt', 'DESC']],
+        limit: 10
+      });
+      return docs.map(d => d.get({ plain: true }));
     }
+
+    where[Op.or] = orConditions;
 
     const docs = await Document.findAll({
       where,
-      attributes: ['id', 'title', 'documentType', 'category', 'description', 'tags', 'version', 'fileType', 'createdAt'],
+      attributes: ['id', 'title', 'documentType', 'category', 'description', 'tags', 'version', 'fileType', 'textContent', 'createdAt'],
+      include: [{ model: User, as: 'author', attributes: ['name'] }],
       order: [['createdAt', 'DESC']],
-      limit: 8,
-      raw: true
+      limit: 15
     });
 
-    return docs;
+    return docs.map(d => d.get({ plain: true }));
   } catch (error) {
     console.error('Document search error:', error.message);
     return [];
@@ -126,9 +151,18 @@ const getSystemStats = async () => {
       group: ['documentType'],
       raw: true
     });
-    return { totalDocuments: totalDocs, documentsByType: docsByType || [] };
+    const categories = await Document.findAll({
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('category')), 'category']],
+      where: { isActive: true },
+      raw: true
+    });
+    return {
+      totalDocuments: totalDocs,
+      documentsByType: docsByType || [],
+      categories: categories.map(c => c.category).filter(Boolean)
+    };
   } catch (error) {
-    return { totalDocuments: 0, documentsByType: [] };
+    return { totalDocuments: 0, documentsByType: [], categories: [] };
   }
 };
 
@@ -148,32 +182,44 @@ router.post('/chat', authenticate, async (req, res) => {
       getSystemStats()
     ]);
 
-    // Build context with real data
-    let contextBlock = `\n\nCURRENT SYSTEM STATE:
+    // Build context with real document data
+    let contextBlock = `\n\nVAULT STATISTICS:
 - Total Documents: ${stats.totalDocuments}
-- By Type: ${stats.documentsByType.map(d => `${d.documentType}: ${d.count}`).join(', ') || 'None'}`;
+- By Type: ${stats.documentsByType.map(d => `${d.documentType}: ${d.count}`).join(', ') || 'None'}
+- Categories: ${stats.categories.join(', ') || 'None'}`;
 
     if (relevantDocs.length > 0) {
-      contextBlock += `\n\nRELEVANT DOCUMENTS FOUND (${relevantDocs.length}):`;
+      contextBlock += `\n\nSEARCH RESULTS — ${relevantDocs.length} document(s) found:`;
       relevantDocs.forEach((doc, i) => {
-        contextBlock += `\n${i + 1}. "${doc.title}" [${doc.documentType}] — Category: ${doc.category}${doc.description ? `, Description: ${doc.description.substring(0, 100)}` : ''}${doc.tags?.length ? `, Tags: ${doc.tags.join(', ')}` : ''}`;
+        contextBlock += `\n\n--- Document ${i + 1} ---`;
+        contextBlock += `\nTitle: ${doc.title}`;
+        contextBlock += `\nType: ${doc.documentType}`;
+        contextBlock += `\nCategory: ${doc.category}`;
+        if (doc.description) contextBlock += `\nDescription: ${doc.description}`;
+        if (doc.tags?.length) contextBlock += `\nTags: ${doc.tags.join(', ')}`;
+        contextBlock += `\nVersion: ${doc.version || '1.0.0'}`;
+        if (doc.author?.name) contextBlock += `\nAuthor: ${doc.author.name}`;
+        contextBlock += `\nDate: ${doc.createdAt}`;
+        if (doc.textContent) {
+          contextBlock += `\nContent: ${doc.textContent.substring(0, 500)}`;
+        }
       });
-      contextBlock += '\n\nUse these documents in your response when relevant. Reference them by title and type.';
+      contextBlock += '\n\nAnswer the user\'s question using ONLY these documents. Reference documents by their exact title and type code.';
+    } else {
+      contextBlock += '\n\nNo documents matched the search query. Tell the user no matching documents were found and suggest they try different keywords or check what document types are available.';
     }
 
     // Build conversation for Gemini
-    const fullPrompt = `${SYSTEM_PROMPT}${contextBlock}
-
-User: ${message}`;
+    const fullPrompt = `${SYSTEM_PROMPT}${contextBlock}\n\nUser question: ${message}`;
 
     if (api) {
       try {
         const model = api.getGenerativeModel({
           model: 'gemini-1.5-flash',
           generationConfig: {
-            temperature: 0.7,
-            topP: 0.9,
-            maxOutputTokens: 1024
+            temperature: 0.3,
+            topP: 0.85,
+            maxOutputTokens: 1500
           }
         });
 
@@ -193,7 +239,6 @@ User: ${message}`;
         let responseText;
 
         if (history.length >= 2) {
-          // Use chat mode for multi-turn conversations
           const chat = model.startChat({
             history,
             systemInstruction: { parts: [{ text: SYSTEM_PROMPT + contextBlock }] }
@@ -201,7 +246,6 @@ User: ${message}`;
           const result = await chat.sendMessage(message);
           responseText = result.response.text();
         } else {
-          // Single-turn for first message
           const result = await model.generateContent(fullPrompt);
           responseText = result.response.text();
         }
@@ -217,30 +261,29 @@ User: ${message}`;
         });
       } catch (geminiError) {
         console.error('Gemini error:', geminiError.message);
-        // Fall through to fallback
       }
     }
 
-    // Fallback response with actual document data
-    let fallback = `I'm having trouble connecting to the AI service right now, but I can still help!\n\n`;
-
-    if (stats.totalDocuments > 0) {
-      fallback += `**Your Vault Overview:**\n- **${stats.totalDocuments}** total documents\n`;
-      stats.documentsByType.forEach(d => {
-        fallback += `- **${d.documentType}**: ${d.count} documents\n`;
-      });
-    } else {
-      fallback += `Your vault is currently empty. Click **"Load Sample Data"** on the dashboard to get started with 30 sample documents.\n`;
-    }
+    // Fallback response without Gemini
+    let fallback = '';
 
     if (relevantDocs.length > 0) {
-      fallback += `\n**Documents matching your query:**\n`;
-      relevantDocs.slice(0, 5).forEach(doc => {
-        fallback += `- **${doc.title}** [${doc.documentType}] — ${doc.category}\n`;
+      fallback += `**Found ${relevantDocs.length} document(s) matching your query:**\n\n`;
+      relevantDocs.slice(0, 8).forEach((doc, i) => {
+        fallback += `${i + 1}. **${doc.title}** [${doc.documentType}] — ${doc.category}`;
+        if (doc.description) fallback += `\n   ${doc.description.substring(0, 120)}`;
+        fallback += '\n\n';
       });
+    } else {
+      fallback += `**No documents found matching your query.**\n\n`;
+      fallback += `Try searching by:\n- Document type: MN, MI, QI, QAN, VA, PCA\n- Category or topic keywords\n- Specific document titles\n\n`;
+      if (stats.totalDocuments > 0) {
+        fallback += `**Your vault has ${stats.totalDocuments} documents:**\n`;
+        stats.documentsByType.forEach(d => {
+          fallback += `- **${d.documentType}**: ${d.count} documents\n`;
+        });
+      }
     }
-
-    fallback += `\n**Quick Help:**\n- Upload documents via the sidebar upload panel\n- Use filters to narrow down by type, category, or tags\n- Click any document to preview or download\n- Check Analytics for real-time insights`;
 
     res.json({
       success: true,
@@ -260,7 +303,7 @@ User: ${message}`;
 });
 
 router.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'AI Assistant' });
+  res.json({ status: 'ok', service: 'AI Document Search' });
 });
 
 export default router;

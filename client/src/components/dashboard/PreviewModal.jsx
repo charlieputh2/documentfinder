@@ -8,6 +8,7 @@ const PreviewModal = ({ open, document, onClose, onDownload }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [pdfError, setPdfError] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const CHARS_PER_PAGE = 2000;
   const formats = useMemo(() => getAvailableFormats(document || {}), [document]);
   const typeConfig = useMemo(() => getDocumentTypeConfig(document?.documentType), [document?.documentType]);
@@ -17,6 +18,7 @@ const PreviewModal = ({ open, document, onClose, onDownload }) => {
     setCurrentPage(1);
     setIsImageLoaded(false);
     setPdfError(false);
+    setImageError(false);
   }, [document?.id]);
 
   // Reset page when modal opens
@@ -160,13 +162,21 @@ const PreviewModal = ({ open, document, onClose, onDownload }) => {
               </div>
             </div>
           )}
-          <img
-            src={document.fileUrl}
-            alt={document.title}
-            className={`max-h-full max-w-full rounded-xl object-contain transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={() => setIsImageLoaded(true)}
-            onError={() => setIsImageLoaded(true)}
-          />
+          {imageError ? (
+            <div className="flex flex-col items-center gap-3 text-slate-400">
+              <ImageIcon className="h-12 w-12 text-slate-500" />
+              <p className="text-sm">Failed to load image preview</p>
+              <button type="button" onClick={() => onDownload?.(document)} className="rounded-full border border-primary/50 px-4 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-white">Download instead</button>
+            </div>
+          ) : (
+            <img
+              src={document.fileUrl}
+              alt={document.title}
+              className={`max-h-full max-w-full rounded-xl object-contain transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setIsImageLoaded(true)}
+              onError={() => { setIsImageLoaded(true); setImageError(true); }}
+            />
+          )}
         </div>
       );
     }
@@ -256,9 +266,8 @@ const PreviewModal = ({ open, document, onClose, onDownload }) => {
                       </Dialog.Title>
                       <div className="flex flex-wrap items-center gap-2">
                         {typeConfig && (
-                          <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
-                            <span>{typeConfig.icon}</span>
-                            <span>{typeConfig.code}</span>
+                          <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                            {typeConfig.code}
                           </span>
                         )}
                         <span className="text-xs uppercase tracking-[0.35em] text-slate-500">

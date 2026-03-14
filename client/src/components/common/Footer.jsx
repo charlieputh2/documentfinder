@@ -42,27 +42,27 @@ const Footer = () => {
                   <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-400">Supported Document Types</p>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-blue-500/10 text-[0.6rem] font-bold text-blue-400 border border-blue-400/20">MN</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">MN</span>
                       <span className="text-[0.65rem] text-slate-400">Manufacturing Notice</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-indigo-500/10 text-[0.6rem] font-bold text-indigo-400 border border-indigo-400/20">MI</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">MI</span>
                       <span className="text-[0.65rem] text-slate-400">Manufacturing Instructions</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-emerald-500/10 text-[0.6rem] font-bold text-emerald-400 border border-emerald-400/20">QI</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">QI</span>
                       <span className="text-[0.65rem] text-slate-400">Quality Instructions</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-amber-500/10 text-[0.6rem] font-bold text-amber-400 border border-amber-400/20">QAN</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">QAN</span>
                       <span className="text-[0.65rem] text-slate-400">Quality Alert Notice</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-purple-500/10 text-[0.6rem] font-bold text-purple-400 border border-purple-400/20">VA</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">VA</span>
                       <span className="text-[0.65rem] text-slate-400">Visual Aide</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-rose-500/10 text-[0.6rem] font-bold text-rose-400 border border-rose-400/20">PCA</span>
+                      <span className="inline-flex h-5 w-9 items-center justify-center rounded bg-white/10 text-[0.6rem] font-bold text-slate-300 border border-white/20">PCA</span>
                       <span className="text-[0.65rem] text-slate-400">Process Change Approval</span>
                     </div>
                   </div>
@@ -91,19 +91,19 @@ const Footer = () => {
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Features</p>
                 <ul className="space-y-2 text-xs text-slate-400">
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
+                    <svg className="h-3 w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     <span>Secure JWT Auth</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
+                    <svg className="h-3 w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     <span>Role-Based Access</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
+                    <svg className="h-3 w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     <span>Live Previews</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <span className="text-primary">✓</span>
+                    <svg className="h-3 w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     <span>AI Assistant</span>
                   </li>
                 </ul>
@@ -113,10 +113,10 @@ const Footer = () => {
               <div className="space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">Contact</p>
                 <div className="space-y-2 text-xs text-slate-400">
-                  <p>🏢 Tesla Giga Nevada</p>
-                  <p>📍 Nevada, USA</p>
+                  <p>Tesla Giga Nevada</p>
+                  <p>Nevada, USA</p>
                   <a href="mailto:contact@tesla.com" className="flex items-center gap-1 transition hover:text-primary">
-                    📧 contact@tesla.com
+                    contact@tesla.com
                   </a>
                 </div>
               </div>
@@ -144,7 +144,7 @@ const Footer = () => {
               <div className="flex flex-col gap-3 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
                 <p>© {currentYear} Tesla Manufacturing & Quality Vault. All rights reserved.</p>
                 <div className="flex items-center justify-center gap-2">
-                  <span className="inline-flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="inline-flex h-2 w-2 rounded-full bg-primary animate-pulse" />
                   <span>System Status: Operational</span>
                 </div>
               </div>

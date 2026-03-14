@@ -413,13 +413,15 @@ router.get('/', async (req, res) => {
       fileType
     } = req.query;
 
-    const limit = Math.min(Number(rawLimit) || 12, 100);
+    const limit = Math.min(Math.max(Number(rawLimit) || 12, 1), 100);
+    const pageNum = Math.max(Number(page) || 1, 1);
     const where = { isActive: true };
 
     if (search) {
       where[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
-        { description: { [Op.iLike]: `%${search}%` } }
+        { description: { [Op.iLike]: `%${search}%` } },
+        { textContent: { [Op.iLike]: `%${search}%` } }
       ];
     }
 
@@ -445,7 +447,7 @@ router.get('/', async (req, res) => {
       }
     }
 
-    const offset = (Number(page) - 1) * limit;
+    const offset = (pageNum - 1) * limit;
 
     const { rows, count } = await Document.findAndCountAll({
       where,
@@ -459,7 +461,7 @@ router.get('/', async (req, res) => {
       documents: rows,
       pagination: {
         total: count,
-        page: Number(page),
+        page: pageNum,
         pages: Math.ceil(count / limit)
       }
     });
@@ -478,7 +480,8 @@ router.get('/export-all', async (req, res) => {
     if (search) {
       where[Op.or] = [
         { title: { [Op.iLike]: `%${search}%` } },
-        { description: { [Op.iLike]: `%${search}%` } }
+        { description: { [Op.iLike]: `%${search}%` } },
+        { textContent: { [Op.iLike]: `%${search}%` } }
       ];
     }
     if (documentType) where.documentType = documentType;
@@ -662,6 +665,10 @@ router.get('/:id/download', async (req, res) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
+    if (!document.fileUrl) {
+      return res.status(400).json({ message: 'This document does not have an attached file' });
+    }
+
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(document.fileUrl);
     if (!response.ok) {
@@ -686,10 +693,20 @@ router.get('/:id/download', async (req, res) => {
       'Cache-Control': 'no-cache'
     });
 
+    response.body.on('error', (err) => {
+      console.error('Download stream error:', err);
+      if (!res.headersSent) {
+        res.status(502).json({ message: 'File transfer failed' });
+      } else {
+        res.end();
+      }
+    });
     response.body.pipe(res);
   } catch (error) {
     console.error('Download proxy error:', error);
-    res.status(500).json({ message: 'Unable to download file' });
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Unable to download file' });
+    }
   }
 });
 

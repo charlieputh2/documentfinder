@@ -76,7 +76,7 @@ const MarkdownText = ({ text }) => {
       // Code blocks (single backtick lines)
       if (trimmed.startsWith('`') && trimmed.endsWith('`') && trimmed.length > 2) {
         elements.push(
-          <code key={idx} className="block my-1 rounded bg-white/10 px-2 py-1 text-xs text-emerald-300 font-mono">
+          <code key={idx} className="block my-1 rounded bg-white/10 px-2 py-1 text-xs text-slate-300 font-mono">
             {trimmed.slice(1, -1)}
           </code>
         );
@@ -131,12 +131,12 @@ const InlineMarkdown = ({ text }) => {
   }, [text]);
 
   const badgeColors = {
-    MN: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    MI: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
-    QI: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    QAN: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    VA: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    PCA: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
+    MN: 'bg-white/10 text-slate-300 border-white/20',
+    MI: 'bg-white/10 text-slate-300 border-white/20',
+    QI: 'bg-white/10 text-slate-300 border-white/20',
+    QAN: 'bg-white/10 text-slate-300 border-white/20',
+    VA: 'bg-white/10 text-slate-300 border-white/20',
+    PCA: 'bg-white/10 text-slate-300 border-white/20'
   };
 
   return (
@@ -148,7 +148,7 @@ const InlineMarkdown = ({ text }) => {
           case 'italic':
             return <em key={i} className="italic text-slate-300">{part.value}</em>;
           case 'code':
-            return <code key={i} className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-emerald-300 font-mono">{part.value}</code>;
+            return <code key={i} className="rounded bg-white/10 px-1.5 py-0.5 text-xs text-slate-300 font-mono">{part.value}</code>;
           case 'badge':
             return <span key={i} className={`inline-flex rounded-md border px-1.5 py-0 text-2xs font-bold ${badgeColors[part.value] || ''}`}>{part.value}</span>;
           default:
@@ -164,12 +164,12 @@ const DocumentChips = ({ documents }) => {
   if (!documents || documents.length === 0) return null;
 
   const badgeColors = {
-    MN: 'border-blue-500/30 text-blue-300',
-    MI: 'border-sky-500/30 text-sky-300',
-    QI: 'border-emerald-500/30 text-emerald-300',
-    QAN: 'border-amber-500/30 text-amber-300',
-    VA: 'border-purple-500/30 text-purple-300',
-    PCA: 'border-rose-500/30 text-rose-300'
+    MN: 'border-white/20 text-slate-300',
+    MI: 'border-white/20 text-slate-300',
+    QI: 'border-white/20 text-slate-300',
+    QAN: 'border-white/20 text-slate-300',
+    VA: 'border-white/20 text-slate-300',
+    PCA: 'border-white/20 text-slate-300'
   };
 
   return (
@@ -194,7 +194,7 @@ const AIHelper = () => {
     {
       id: 1,
       type: 'assistant',
-      content: 'Hello! I\'m your **AI Assistant** powered by Google Gemini. I can help you with:\n\n- **Document search** — find documents by type, category, or keywords\n- **System guidance** — how to upload, filter, preview, download\n- **Analytics** — understand your document statistics\n- **Document types** — [MN] [MI] [QI] [QAN] [VA] [PCA] explained\n\nWhat can I help you with?',
+      content: 'Hello! I\'m the **Document Search Assistant** for the Tesla Vault. I can help you find and understand documents in your system.\n\n### What I can do:\n- **Search documents** by type, category, keywords, or content\n- **Summarize** what specific documents contain\n- **Find related** documents across [MN] [MI] [QI] [QAN] [VA] [PCA] types\n\nTry asking me about specific topics, document types, or keywords.',
       documents: [],
       timestamp: new Date()
     }
@@ -283,12 +283,12 @@ const AIHelper = () => {
   };
 
   const suggestedQuestions = [
-    'What manufacturing documents do we have?',
-    'Show me quality alert notices',
-    'How do I upload a new document?',
-    'What are the 6 document types?',
-    'How to filter documents by category?',
-    'What\'s the difference between MN and MI?'
+    'Show all manufacturing notices',
+    'Find quality alert documents',
+    'What documents are about battery assembly?',
+    'List all visual aide documents',
+    'Show process change approvals',
+    'Find documents about welding procedures'
   ];
 
   return (
@@ -341,9 +341,9 @@ const AIHelper = () => {
                       </div>
                       <div>
                         <Dialog.Title className="font-heading text-base text-white sm:text-lg font-bold">
-                          Vault AI Assistant
+                          Document Search AI
                         </Dialog.Title>
-                        <p className="text-[0.65rem] text-slate-400 sm:text-xs">Powered by Google Gemini — searches your documents</p>
+                        <p className="text-[0.65rem] text-slate-400 sm:text-xs">Search and ask questions about your vault documents</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">

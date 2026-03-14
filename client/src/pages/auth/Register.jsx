@@ -139,12 +139,12 @@ const Register = () => {
       
       await Swal.fire({
         icon: 'success',
-        title: '✅ Account Verified Successfully!',
+        title: 'Account Verified Successfully!',
         html: `
           <div style="text-align: center; color: #cbd5f5;">
             <p style="margin: 12px 0; font-size: 15px;">Your account is now ready to use.</p>
-            <div style="background: #0f1118; border-left: 3px solid #10b981; padding: 12px; border-radius: 6px; margin: 16px 0;">
-              <p style="margin: 0; font-size: 14px; color: #10b981;">✓ Verification Complete</p>
+            <div style="background: #0f1118; border-left: 3px solid #e82127; padding: 12px; border-radius: 6px; margin: 16px 0;">
+              <p style="margin: 0; font-size: 14px; color: #e82127;">Verification Complete</p>
             </div>
             <p style="margin: 12px 0; font-size: 14px; color: #8794b4;">You can now log in with your credentials.</p>
             <p style="margin: 12px 0; font-size: 12px; color: #546389;">Redirecting to login...</p>
@@ -178,7 +178,7 @@ const Register = () => {
             <ul className="space-y-4 text-sm text-slate-200">
               {['Secure JWT authentication', 'Role-based permissions', 'Live previews & instant downloads'].map((item) => (
                 <li key={item} className="flex items-center gap-3">
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-primary/50 text-xs">✓</span>
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-primary/50"><svg className="h-3 w-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></span>
                   <span>{item}</span>
                 </li>
               ))}

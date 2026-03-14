@@ -24,12 +24,12 @@ const transporter = nodemailer.createTransport({
 
 export const sendOtpEmail = async ({ to, code, name, isRegistration = false }) => {
   if (!MAIL_USER || !MAIL_PASS) {
-    console.error('❌ Email credentials missing:', { MAIL_USER, MAIL_PASS: MAIL_PASS ? '***' : 'missing' });
+    console.error('[ERROR] Email credentials missing:', { MAIL_USER, MAIL_PASS: MAIL_PASS ? '***' : 'missing' });
     throw new Error('Email credentials are not configured');
   }
 
   const subject = isRegistration 
-    ? '🎉 Welcome to Tesla Ops - Enter Your Verification Code'
+    ? 'Welcome to Tesla Ops - Enter Your Verification Code'
     : 'Tesla Ops verification code';
 
   const title = isRegistration
@@ -68,7 +68,7 @@ export const sendOtpEmail = async ({ to, code, name, isRegistration = false }) =
         </div>
 
         <div style="background: #ff3c2f/10; border: 1px solid #ff3c2f/30; padding: 12px; border-radius: 8px; margin: 16px 0; text-align: center;">
-          <p style="color: #ff3c2f; font-size: 12px; margin: 0;"><strong>⚠️ Important:</strong> Never share this code with anyone. Tesla Ops staff will never ask for it.</p>
+          <p style="color: #ff3c2f; font-size: 12px; margin: 0;"><strong>[WARN] Important:</strong> Never share this code with anyone. Tesla Ops staff will never ask for it.</p>
         </div>
 
         <p style="color: #8794b4; font-size: 13px; margin: 24px 0 0 0;">If you didn't create this account, you can safely ignore this message.</p>
@@ -78,7 +78,7 @@ export const sendOtpEmail = async ({ to, code, name, isRegistration = false }) =
   `;
 
   try {
-    console.log('📧 Sending OTP email to:', to, '(Registration:', isRegistration, ')');
+    console.log('Sending OTP email to:', to, '(Registration:', isRegistration, ')');
     
     // Send email asynchronously without waiting
     transporter.sendMail({
@@ -87,17 +87,17 @@ export const sendOtpEmail = async ({ to, code, name, isRegistration = false }) =
       subject,
       html
     }).then((info) => {
-      console.log('✅ Email sent successfully:', info.messageId);
+      console.log('[OK] Email sent successfully:', info.messageId);
     }).catch((error) => {
-      console.warn('⚠️ Email send failed (async):', error.message);
+      console.warn('[WARN] Email send failed (async):', error.message);
     });
 
     // Return immediately without waiting for email
-    console.log('📧 Email queued for sending');
+    console.log('Email queued for sending');
     return { messageId: 'queued-' + Date.now() };
   } catch (error) {
-    console.error('❌ Email queue error:', error.message);
-    console.warn('⚠️ Continuing - user can still verify later');
+    console.error('[ERROR] Email queue error:', error.message);
+    console.warn('[WARN] Continuing - user can still verify later');
     return { messageId: 'failed-' + Date.now(), error: error.message };
   }
 };

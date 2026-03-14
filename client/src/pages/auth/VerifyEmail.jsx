@@ -69,8 +69,8 @@ const VerifyEmail = () => {
         ) : verified ? (
           <div className="space-y-4 py-4">
             <div className="flex justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20 border border-emerald-500/50">
-                <svg className="h-8 w-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 border border-primary/50">
+                <svg className="h-8 w-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
               </div>

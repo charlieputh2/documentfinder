@@ -98,6 +98,63 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 });
 
+// Admin: Create new user account
+router.post(
+  '/',
+  authenticate,
+  authorize('admin'),
+  [
+    body('firstName').trim().notEmpty().withMessage('First name is required'),
+    body('lastName').trim().notEmpty().withMessage('Last name is required'),
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('role').optional().isIn(['admin', 'user']).withMessage('Role must be admin or user'),
+    body('middleName').optional().trim(),
+    body('suffix').optional().trim()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const { firstName, lastName, email, password, role, middleName, suffix } = req.body;
+
+      const existing = await User.findOne({ where: { email } });
+      if (existing) {
+        return res.status(409).json({ message: 'Email already in use' });
+      }
+
+      const user = await User.create({
+        firstName,
+        middleName: middleName || '',
+        lastName,
+        suffix: suffix || '',
+        email,
+        password,
+        role: role || 'user',
+        isVerified: true,
+        isActive: true
+      });
+
+      await logAudit({
+        userId: req.user.id,
+        action: 'USER_REGISTERED',
+        description: `${req.user.name} created account for ${user.name}`,
+        metadata: { targetUser: user.id },
+        ipAddress: req.ip
+      });
+
+      const safeUser = await User.findByPk(user.id);
+      res.status(201).json(safeUser);
+    } catch (error) {
+      console.error('Create user error:', error);
+      res.status(500).json({ message: 'Unable to create user' });
+    }
+  }
+);
+
 // Admin: Update user
 router.put(
   '/:id',
@@ -124,6 +181,14 @@ router.put(
       const user = await User.scope('withPassword').findByPk(req.params.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Check email uniqueness if changing email
+      if (req.body.email && req.body.email !== user.email) {
+        const emailTaken = await User.findOne({ where: { email: req.body.email } });
+        if (emailTaken) {
+          return res.status(409).json({ message: 'Email already in use' });
+        }
       }
 
       const payload = {

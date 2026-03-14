@@ -71,7 +71,7 @@ router.post(
         photoData
       } = req.body;
 
-      console.log('📝 Registration attempt:', { firstName, middleName, lastName, suffix, email });
+      console.log('Registration attempt:', { firstName, middleName, lastName, suffix, email });
 
       const existing = await User.scope('withPassword').findOne({ where: { email } });
       if (existing) {
@@ -92,7 +92,7 @@ router.post(
       }
       composedName = composedName.trim() || 'User';
 
-      console.log('📝 Composed name:', composedName);
+      console.log('Composed name:', composedName);
 
       const emailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
@@ -108,29 +108,29 @@ router.post(
         isVerified: !emailConfigured
       });
 
-      console.log('✅ User created:', user.id, 'Full name:', user.name);
+      console.log('[OK] User created:', user.id, 'Full name:', user.name);
 
       try {
-        console.log('📸 Uploading photo to Cloudinary...');
+        console.log('Uploading photo to Cloudinary...');
         const upload = await cloudinary.uploader.upload(photoData, {
           folder: 'document-finder/users',
           resource_type: 'image',
           transformation: [{ width: 600, height: 600, crop: 'fill', gravity: 'face', quality: 'auto' }]
         });
-        console.log('✅ Photo uploaded:', upload.public_id);
+        console.log('[OK] Photo uploaded:', upload.public_id);
         await user.update({ photoUrl: upload.secure_url, photoPublicId: upload.public_id });
       } catch (uploadError) {
-        console.error('❌ Photo upload error:', uploadError?.message || uploadError);
+        console.error('[ERROR] Photo upload error:', uploadError?.message || uploadError);
         await user.destroy();
         return res.status(500).json({ message: 'Unable to process profile photo. Please retry with a smaller image.' });
       }
 
       if (emailConfigured) {
-        console.log('📧 Sending registration OTP email to:', user.email);
+        console.log('Sending registration OTP email to:', user.email);
         try {
           await sendAndStoreOtp({ user, isRegistration: true });
         } catch (emailError) {
-          console.warn('⚠️ Email failed but registration continues:', emailError.message);
+          console.warn('[WARN] Email failed but registration continues:', emailError.message);
         }
       }
 
@@ -141,7 +141,7 @@ router.post(
         ipAddress: req.ip
       });
 
-      console.log('✅ Registration complete for:', user.email);
+      console.log('[OK] Registration complete for:', user.email);
 
       if (user.isVerified) {
         await user.update({ lastLogin: new Date() });
@@ -159,7 +159,7 @@ router.post(
         email: user.email
       });
     } catch (error) {
-      console.error('❌ Register error:', error.message, error.stack);
+      console.error('[ERROR] Register error:', error.message, error.stack);
       res.status(500).json({ message: 'Server error: ' + error.message });
     }
   }
@@ -198,7 +198,7 @@ router.post(
           try {
             await sendAndStoreOtp({ user });
           } catch (emailError) {
-            console.warn('⚠️ Email failed but OTP stored:', emailError.message);
+            console.warn('[WARN] Email failed but OTP stored:', emailError.message);
           }
           return res.status(403).json({
             message: 'Account not verified. A fresh code was sent to your email.',
@@ -310,7 +310,7 @@ router.post(
       try {
         await sendAndStoreOtp({ user });
       } catch (emailError) {
-        console.warn('⚠️ Email failed but OTP stored:', emailError.message);
+        console.warn('[WARN] Email failed but OTP stored:', emailError.message);
       }
 
       await logAudit({
@@ -351,7 +351,9 @@ router.post(
         resetPasswordExpires: new Date(Date.now() + 60 * 60 * 1000)
       });
 
-      console.log(`Password reset token for ${user.email}: ${resetToken}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[DEV] Password reset token for ${user.email}: ${resetToken}`);
+      }
       await logAudit({
         userId: user.id,
         action: 'PASSWORD_RESET_REQUESTED',

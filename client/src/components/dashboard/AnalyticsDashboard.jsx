@@ -78,7 +78,6 @@ const AnalyticsDashboard = ({ overview, loading }) => {
                     <div className="flex items-center justify-between text-xs sm:text-sm">
                       <span className="flex items-center gap-2 text-slate-300">
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-semibold ${item.color.bg} ${item.color.text} ${item.color.border}`}>
-                          <span>{item.icon}</span>
                           <span>{item.code}</span>
                         </span>
                         <span className="text-2xs sm:text-sm">{item.name}</span>
@@ -128,12 +127,12 @@ const AnalyticsDashboard = ({ overview, loading }) => {
                         idx === 0
                           ? 'bg-gradient-to-r from-primary to-primary/60'
                           : idx === 1
-                          ? 'bg-gradient-to-r from-emerald-400 to-emerald-400/60'
+                          ? 'bg-gradient-to-r from-slate-300 to-slate-300/60'
                           : idx === 2
-                          ? 'bg-gradient-to-r from-blue-400 to-blue-400/60'
+                          ? 'bg-gradient-to-r from-slate-400 to-slate-400/60'
                           : idx === 3
-                          ? 'bg-gradient-to-r from-purple-400 to-purple-400/60'
-                          : 'bg-gradient-to-r from-cyan-400 to-cyan-400/60'
+                          ? 'bg-gradient-to-r from-slate-500 to-slate-500/60'
+                          : 'bg-gradient-to-r from-slate-600 to-slate-600/60'
                       }`}
                       style={{ width: `${(category.count / maxCategoryCount) * 100}%` }}
                     />
@@ -156,7 +155,6 @@ const AnalyticsDashboard = ({ overview, loading }) => {
           return (
             <div key={dt.code} className={`rounded-xl border p-3 sm:rounded-2xl sm:p-4 transition-all hover:scale-[1.03] ${dt.color.bg} ${dt.color.border}`}>
               <div className="flex items-center gap-1.5 mb-2">
-                <span className="text-base">{dt.icon}</span>
                 <span className={`text-xs font-bold ${dt.color.text}`}>{dt.code}</span>
               </div>
               <p className={`font-heading text-xl sm:text-2xl ${dt.color.text}`}>{count}</p>

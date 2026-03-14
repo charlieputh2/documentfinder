@@ -24,8 +24,8 @@ const DocumentCard = ({ document, onPreview, onDownload, onEdit, onDelete, onTog
                 onClick={() => onToggleFavorite(document.id)}
                 className={`rounded-lg p-1.5 transition active:scale-90 touch-manipulation ${
                   isFavorite
-                    ? 'text-amber-400'
-                    : 'text-slate-500 hover:text-amber-400'
+                    ? 'text-primary'
+                    : 'text-slate-500 hover:text-primary'
                 }`}
                 title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
               >
@@ -39,7 +39,7 @@ const DocumentCard = ({ document, onPreview, onDownload, onEdit, onDelete, onTog
                 <button
                   type="button"
                   onClick={() => onEdit(document)}
-                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-blue-500/10 hover:text-blue-400 active:scale-90 touch-manipulation"
+                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-primary/10 hover:text-primary active:scale-90 touch-manipulation"
                   title="Edit"
                 >
                   <Pencil className="h-3.5 w-3.5" />
@@ -63,7 +63,6 @@ const DocumentCard = ({ document, onPreview, onDownload, onEdit, onDelete, onTog
         <div>
           {typeConfig && (
             <div className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-2xs font-semibold sm:px-3 sm:py-1 sm:text-xs ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border} transition-all ${typeConfig.color.hoverBg}`}>
-              <span className="text-sm sm:text-base">{typeConfig.icon}</span>
               <span>{typeConfig.code}</span>
               <span className="hidden sm:inline">- {typeConfig.name}</span>
             </div>

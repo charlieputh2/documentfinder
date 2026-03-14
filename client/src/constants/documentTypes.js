@@ -1,6 +1,6 @@
 /**
  * Document Type Constants and Utilities
- * Defines all supported document types with their metadata
+ * Tesla red / white / gray palette only
  */
 
 export const DOCUMENT_TYPES = {
@@ -9,13 +9,13 @@ export const DOCUMENT_TYPES = {
     name: 'Manufacturing Notice',
     description: 'Critical notifications and alerts for manufacturing processes',
     color: {
-      bg: 'bg-blue-500/10',
-      text: 'text-blue-400',
-      border: 'border-blue-400/30',
-      hoverBg: 'hover:bg-blue-500/20',
-      badge: 'bg-gradient-to-r from-blue-500/20 to-blue-600/20'
+      bg: 'bg-primary/10',
+      text: 'text-primary',
+      border: 'border-primary/20',
+      hoverBg: 'hover:bg-primary/15',
+      badge: 'bg-primary/20'
     },
-    icon: '🏭',
+    icon: '',
     category: 'manufacturing'
   },
   MI: {
@@ -23,13 +23,13 @@ export const DOCUMENT_TYPES = {
     name: 'Manufacturing Instructions',
     description: 'Detailed step-by-step manufacturing procedures and guidelines',
     color: {
-      bg: 'bg-indigo-500/10',
-      text: 'text-indigo-400',
-      border: 'border-indigo-400/30',
-      hoverBg: 'hover:bg-indigo-500/20',
-      badge: 'bg-gradient-to-r from-indigo-500/20 to-indigo-600/20'
+      bg: 'bg-primary/10',
+      text: 'text-primary',
+      border: 'border-primary/20',
+      hoverBg: 'hover:bg-primary/15',
+      badge: 'bg-primary/20'
     },
-    icon: '📋',
+    icon: '',
     category: 'manufacturing'
   },
   QI: {
@@ -37,13 +37,13 @@ export const DOCUMENT_TYPES = {
     name: 'Quality Instructions',
     description: 'Quality control procedures and inspection guidelines',
     color: {
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-      border: 'border-emerald-400/30',
-      hoverBg: 'hover:bg-emerald-500/20',
-      badge: 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/20'
+      bg: 'bg-white/5',
+      text: 'text-white',
+      border: 'border-white/10',
+      hoverBg: 'hover:bg-white/10',
+      badge: 'bg-white/10'
     },
-    icon: '✓',
+    icon: '',
     category: 'quality'
   },
   QAN: {
@@ -51,13 +51,13 @@ export const DOCUMENT_TYPES = {
     name: 'Quality Alert Notice',
     description: 'Quality alerts and non-conformance notifications',
     color: {
-      bg: 'bg-amber-500/10',
-      text: 'text-amber-400',
-      border: 'border-amber-400/30',
-      hoverBg: 'hover:bg-amber-500/20',
-      badge: 'bg-gradient-to-r from-amber-500/20 to-amber-600/20'
+      bg: 'bg-white/5',
+      text: 'text-white',
+      border: 'border-white/10',
+      hoverBg: 'hover:bg-white/10',
+      badge: 'bg-white/10'
     },
-    icon: '⚠️',
+    icon: '',
     category: 'quality'
   },
   VA: {
@@ -65,13 +65,13 @@ export const DOCUMENT_TYPES = {
     name: 'Visual Aide',
     description: 'Visual references, diagrams, and instructional images',
     color: {
-      bg: 'bg-purple-500/10',
-      text: 'text-purple-400',
-      border: 'border-purple-400/30',
-      hoverBg: 'hover:bg-purple-500/20',
-      badge: 'bg-gradient-to-r from-purple-500/20 to-purple-600/20'
+      bg: 'bg-slate-500/10',
+      text: 'text-slate-300',
+      border: 'border-slate-500/20',
+      hoverBg: 'hover:bg-slate-500/15',
+      badge: 'bg-slate-500/15'
     },
-    icon: '👁️',
+    icon: '',
     category: 'visual'
   },
   PCA: {
@@ -79,13 +79,13 @@ export const DOCUMENT_TYPES = {
     name: 'Process Change Approval',
     description: 'Process modification requests and change control documentation',
     color: {
-      bg: 'bg-rose-500/10',
-      text: 'text-rose-400',
-      border: 'border-rose-400/30',
-      hoverBg: 'hover:bg-rose-500/20',
-      badge: 'bg-gradient-to-r from-rose-500/20 to-rose-600/20'
+      bg: 'bg-slate-500/10',
+      text: 'text-slate-300',
+      border: 'border-slate-500/20',
+      hoverBg: 'hover:bg-slate-500/15',
+      badge: 'bg-slate-500/15'
     },
-    icon: '🔄',
+    icon: '',
     category: 'approval'
   }
 };
@@ -99,11 +99,11 @@ export const LEGACY_TYPES = {
     color: {
       bg: 'bg-primary/10',
       text: 'text-primary',
-      border: 'border-primary/30',
-      hoverBg: 'hover:bg-primary/20',
-      badge: 'bg-gradient-to-r from-primary/20 to-primary/30'
+      border: 'border-primary/20',
+      hoverBg: 'hover:bg-primary/15',
+      badge: 'bg-primary/20'
     },
-    icon: '⚙️',
+    icon: '',
     category: 'manufacturing'
   },
   quality: {
@@ -111,13 +111,13 @@ export const LEGACY_TYPES = {
     name: 'Quality Control',
     description: 'General quality documentation',
     color: {
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-      border: 'border-emerald-400/30',
-      hoverBg: 'hover:bg-emerald-500/20',
-      badge: 'bg-gradient-to-r from-emerald-500/20 to-emerald-600/20'
+      bg: 'bg-white/5',
+      text: 'text-white',
+      border: 'border-white/10',
+      hoverBg: 'hover:bg-white/10',
+      badge: 'bg-white/10'
     },
-    icon: '✓',
+    icon: '',
     category: 'quality'
   }
 };
@@ -132,44 +132,40 @@ export const getDocumentTypeConfig = (type) => {
 
   const normalized = type.toUpperCase().trim();
 
-  // Check new document types first
   if (DOCUMENT_TYPES[normalized]) {
     return DOCUMENT_TYPES[normalized];
   }
 
-  // Check legacy types
   const legacyKey = type.toLowerCase();
   if (LEGACY_TYPES[legacyKey]) {
     return LEGACY_TYPES[legacyKey];
   }
 
-  // Default fallback
   return {
     code: normalized,
     name: type,
     description: 'Document',
     color: {
-      bg: 'bg-slate-500/10',
+      bg: 'bg-white/5',
       text: 'text-slate-400',
-      border: 'border-slate-400/30',
-      hoverBg: 'hover:bg-slate-500/20',
-      badge: 'bg-gradient-to-r from-slate-500/20 to-slate-600/20'
+      border: 'border-white/10',
+      hoverBg: 'hover:bg-white/10',
+      badge: 'bg-white/10'
     },
-    icon: '📄',
+    icon: '',
     category: 'other'
   };
 };
 
 /**
  * Get all available document types for filters
- * @returns {Array} Array of document type options
  */
 export const getAllDocumentTypes = () => {
   return [
     { value: '', label: 'All Types' },
     ...Object.values(DOCUMENT_TYPES).map(type => ({
       value: type.code,
-      label: `${type.icon} ${type.code} - ${type.name}`,
+      label: `${type.code} - ${type.name}`,
       category: type.category
     }))
   ];
@@ -177,7 +173,6 @@ export const getAllDocumentTypes = () => {
 
 /**
  * Get document types grouped by category
- * @returns {object} Document types grouped by category
  */
 export const getDocumentTypesByCategory = () => {
   const grouped = {
@@ -201,8 +196,6 @@ export const getDocumentTypesByCategory = () => {
 
 /**
  * Validate if a document type code is valid
- * @param {string} type - Document type code
- * @returns {boolean} True if valid
  */
 export const isValidDocumentType = (type) => {
   if (!type) return false;
@@ -212,8 +205,6 @@ export const isValidDocumentType = (type) => {
 
 /**
  * Get badge classes for a document type
- * @param {string} type - Document type code
- * @returns {string} CSS classes for badge
  */
 export const getDocumentTypeBadgeClasses = (type) => {
   const config = getDocumentTypeConfig(type);
@@ -222,8 +213,6 @@ export const getDocumentTypeBadgeClasses = (type) => {
 
 /**
  * Get icon for document type
- * @param {string} type - Document type code
- * @returns {string} Icon emoji
  */
 export const getDocumentTypeIcon = (type) => {
   const config = getDocumentTypeConfig(type);

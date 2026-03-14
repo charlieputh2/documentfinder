@@ -28,9 +28,8 @@ const RecentDocuments = ({ documents = [], onPreview, onDownload, onEdit, onDele
               <div className="min-w-0 flex-1 flex items-start gap-3">
                 {/* Type badge */}
                 {typeConfig && (
-                  <span className={`mt-0.5 shrink-0 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
-                    <span>{typeConfig.icon}</span>
-                    <span>{typeConfig.code}</span>
+                  <span className={`mt-0.5 shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                    {typeConfig.code}
                   </span>
                 )}
                 <div className="min-w-0 flex-1">
@@ -69,8 +68,8 @@ const RecentDocuments = ({ documents = [], onPreview, onDownload, onEdit, onDele
                       onClick={() => onToggleFavorite(doc.id)}
                       className={`flex items-center justify-center rounded-lg border p-2 min-h-[40px] transition active:scale-95 sm:rounded-full sm:p-1.5 sm:min-h-0 touch-manipulation ${
                         isFavorite?.(doc.id)
-                          ? 'border-amber-400/30 bg-amber-500/10 text-amber-400'
-                          : 'border-white/10 text-slate-400 hover:border-amber-400/30 hover:bg-amber-500/10 hover:text-amber-400'
+                          ? 'border-primary/30 bg-primary/10 text-primary'
+                          : 'border-white/10 text-slate-400 hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
                       }`}
                       title={isFavorite?.(doc.id) ? 'Remove from favorites' : 'Add to favorites'}
                     >
@@ -81,7 +80,7 @@ const RecentDocuments = ({ documents = [], onPreview, onDownload, onEdit, onDele
                     <button
                       type="button"
                       onClick={() => onEdit(doc)}
-                      className="flex items-center justify-center rounded-lg border border-white/10 p-2 min-h-[40px] text-slate-400 transition hover:border-blue-400/30 hover:bg-blue-500/10 hover:text-blue-400 active:scale-95 opacity-0 group-hover:opacity-100 sm:rounded-full sm:p-1.5 sm:min-h-0 touch-manipulation"
+                      className="flex items-center justify-center rounded-lg border border-white/10 p-2 min-h-[40px] text-slate-400 transition hover:border-primary/30 hover:bg-primary/10 hover:text-primary active:scale-95 opacity-0 group-hover:opacity-100 sm:rounded-full sm:p-1.5 sm:min-h-0 touch-manipulation"
                       title="Edit"
                     >
                       <Pencil className="h-3.5 w-3.5" />

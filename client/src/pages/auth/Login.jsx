@@ -64,12 +64,12 @@ const Login = () => {
       const Swal = (await import('sweetalert2')).default;
       await Swal.fire({
         icon: 'success',
-        title: '✅ Verification Successful!',
+        title: 'Verification Successful!',
         html: `
           <div style="text-align: center; color: #cbd5f5;">
             <p style="margin: 12px 0; font-size: 15px;">Your account has been verified.</p>
-            <div style="background: #0f1118; border-left: 3px solid #10b981; padding: 12px; border-radius: 6px; margin: 16px 0;">
-              <p style="margin: 0; font-size: 14px; color: #10b981;">✓ You can now access the dashboard</p>
+            <div style="background: #0f1118; border-left: 3px solid #e82127; padding: 12px; border-radius: 6px; margin: 16px 0;">
+              <p style="margin: 0; font-size: 14px; color: #e82127;">You can now access the dashboard</p>
             </div>
             <p style="margin: 12px 0; font-size: 12px; color: #546389;">Redirecting to dashboard...</p>
           </div>
@@ -148,7 +148,7 @@ const Login = () => {
                 <label className="flex items-center justify-between text-xs font-medium text-slate-300 sm:text-sm">
                   <span>Email Address</span>
                   {form.email && (
-                    <span className="text-xs text-primary/70">✓ Valid</span>
+                    <span className="text-xs text-primary/70">Valid</span>
                   )}
                 </label>
                 <div className="relative">
@@ -169,7 +169,9 @@ const Login = () => {
                     placeholder="engineer@tesla.com"
                   />
                   {form.email && (
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">📧</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    </span>
                   )}
                 </div>
               </div>
@@ -203,7 +205,9 @@ const Login = () => {
                     placeholder="••••••••"
                   />
                   {form.password && (
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">🔒</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-primary">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </span>
                   )}
                 </div>
               </div>
@@ -224,7 +228,7 @@ const Login = () => {
                   ) : (
                     <>
                       Enter Vault
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                      <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                     </>
                   )}
                 </span>
@@ -257,7 +261,7 @@ const Login = () => {
             {/* Footer */}
             <div className="border-t border-white/5 px-4 py-4 sm:px-8 sm:py-5">
               <p className="text-center text-xs text-slate-500">
-                🔐 Secure JWT authentication • Role-based access
+                Secure JWT authentication | Role-based access
               </p>
             </div>
           </div>
@@ -274,13 +278,13 @@ const Login = () => {
             </div>
             <div className="space-y-2 sm:space-y-2.5">
               {/* MN */}
-              <div className="group flex items-center gap-3 rounded-xl border border-blue-400/10 bg-blue-500/5 px-3 py-2.5 transition-all duration-300 hover:border-blue-400/30 hover:bg-blue-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 text-base sm:h-9 sm:w-9">
-                  🏭
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  MN
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-blue-400">MN</span>
+                    <span className="text-slate-300">MN</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Manufacturing Notice
                   </p>
@@ -288,13 +292,13 @@ const Login = () => {
                 </div>
               </div>
               {/* MI */}
-              <div className="group flex items-center gap-3 rounded-xl border border-indigo-400/10 bg-indigo-500/5 px-3 py-2.5 transition-all duration-300 hover:border-indigo-400/30 hover:bg-indigo-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/15 text-base sm:h-9 sm:w-9">
-                  📋
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  MI
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-indigo-400">MI</span>
+                    <span className="text-slate-300">MI</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Manufacturing Instructions
                   </p>
@@ -302,13 +306,13 @@ const Login = () => {
                 </div>
               </div>
               {/* QI */}
-              <div className="group flex items-center gap-3 rounded-xl border border-emerald-400/10 bg-emerald-500/5 px-3 py-2.5 transition-all duration-300 hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-base sm:h-9 sm:w-9">
-                  ✅
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  QI
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-emerald-400">QI</span>
+                    <span className="text-slate-300">QI</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Quality Instructions
                   </p>
@@ -316,13 +320,13 @@ const Login = () => {
                 </div>
               </div>
               {/* QAN */}
-              <div className="group flex items-center gap-3 rounded-xl border border-amber-400/10 bg-amber-500/5 px-3 py-2.5 transition-all duration-300 hover:border-amber-400/30 hover:bg-amber-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/15 text-base sm:h-9 sm:w-9">
-                  ⚠️
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  QAN
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-amber-400">QAN</span>
+                    <span className="text-slate-300">QAN</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Quality Alert Notice
                   </p>
@@ -330,13 +334,13 @@ const Login = () => {
                 </div>
               </div>
               {/* VA */}
-              <div className="group flex items-center gap-3 rounded-xl border border-purple-400/10 bg-purple-500/5 px-3 py-2.5 transition-all duration-300 hover:border-purple-400/30 hover:bg-purple-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-500/15 text-base sm:h-9 sm:w-9">
-                  👁️
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  VA
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-purple-400">VA</span>
+                    <span className="text-slate-300">VA</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Visual Aide
                   </p>
@@ -344,13 +348,13 @@ const Login = () => {
                 </div>
               </div>
               {/* PCA */}
-              <div className="group flex items-center gap-3 rounded-xl border border-rose-400/10 bg-rose-500/5 px-3 py-2.5 transition-all duration-300 hover:border-rose-400/30 hover:bg-rose-500/10 hover:translate-x-1 sm:px-4 sm:py-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-base sm:h-9 sm:w-9">
-                  🔄
+              <div className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 transition-all duration-300 hover:border-white/20 hover:bg-white/10 hover:translate-x-1 sm:px-4 sm:py-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-xs font-bold text-slate-300 sm:h-9 sm:w-9">
+                  PCA
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-white sm:text-sm">
-                    <span className="text-rose-400">PCA</span>
+                    <span className="text-slate-300">PCA</span>
                     <span className="mx-1.5 text-slate-600">-</span>
                     Process Change Approval
                   </p>

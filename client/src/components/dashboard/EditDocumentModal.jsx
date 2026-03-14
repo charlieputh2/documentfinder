@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { X, Save } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../../lib/api';
+import api from '../../lib/api.js';
 import { getAllDocumentTypes } from '../../constants/documentTypes.js';
 
 const EditDocumentModal = ({ open, document, onClose, onSaved, categories = [] }) => {

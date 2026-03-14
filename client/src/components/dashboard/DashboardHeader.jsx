@@ -176,14 +176,14 @@ const DashboardHeader = () => {
                       className="w-full rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white sm:px-3 sm:py-2 md:text-sm touch-manipulation"
                       role="menuitem"
                     >
-                      👤 My Profile
+                      My Profile
                     </button>
                     <button
                       onClick={() => { navigate('/'); setMenuOpen(false); }}
                       className="w-full rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white sm:px-3 sm:py-2 md:text-sm touch-manipulation"
                       role="menuitem"
                     >
-                      📊 Dashboard
+                      Dashboard
                     </button>
                     {isAdmin && (
                       <button
@@ -191,7 +191,7 @@ const DashboardHeader = () => {
                         className="w-full rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white sm:px-3 sm:py-2 md:text-sm touch-manipulation"
                         role="menuitem"
                       >
-                        🛡️ Manage Users
+                        Manage Users
                       </button>
                     )}
                   </div>
@@ -202,7 +202,7 @@ const DashboardHeader = () => {
                       className="w-full rounded-lg px-2.5 py-1.5 text-left text-xs font-medium text-red-400 transition hover:bg-red-500/10 sm:px-3 sm:py-2 md:text-sm touch-manipulation"
                       role="menuitem"
                     >
-                      🚪 Logout
+                      Logout
                     </button>
                   </div>
                 </div>
@@ -247,14 +247,14 @@ const DashboardHeader = () => {
               <nav className="flex-1 overflow-y-auto p-4">
                 <div className="space-y-2">
                   <Link to="/" onClick={closeAllMenus} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white touch-manipulation">
-                    📊 Dashboard
+                    Dashboard
                   </Link>
                   <Link to="/profile" onClick={closeAllMenus} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white touch-manipulation">
-                    👤 My Profile
+                    My Profile
                   </Link>
                   {isAdmin && (
                     <Link to="/users" onClick={closeAllMenus} className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/5 hover:text-white touch-manipulation">
-                      🛡️ Manage Users
+                      Manage Users
                     </Link>
                   )}
                 </div>
@@ -270,7 +270,7 @@ const DashboardHeader = () => {
                   onClick={handleLogout}
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/20 touch-manipulation"
                 >
-                  🚪 Logout
+                  Logout
                 </button>
               </div>
             </div>

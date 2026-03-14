@@ -135,6 +135,7 @@ const Dashboard = () => {
   useEffect(() => {
     setPagination((prev) => ({ ...prev, page: 1 }));
     fetchDocuments(1, filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.search, filters.documentType, filters.category, filters.tag, filters.fileType]);
 
   // When pagination page changes (beyond page 1), fetch documents
@@ -142,6 +143,7 @@ const Dashboard = () => {
     if (pagination.page > 1) {
       fetchDocuments(pagination.page, filters);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page]);
 
   const handleFilterChange = (updates) => {
@@ -306,8 +308,8 @@ const Dashboard = () => {
       {!loadingOverview && isAdmin && (overview?.totals?.totalDocuments ?? 0) < 1 && (
         <div className="animate-fadeIn rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 p-4 sm:p-6">
           <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left sm:gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-2xl sm:h-14 sm:w-14">
-              📄
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/20 sm:h-14 sm:w-14">
+              <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             </div>
             <div className="flex-1">
               <h3 className="text-base font-bold text-white sm:text-lg">No documents yet</h3>

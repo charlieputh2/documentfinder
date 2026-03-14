@@ -110,9 +110,8 @@ const CommandPalette = ({ open, onClose, onSelect }) => {
                 }`}
               >
                 {typeConfig && (
-                  <span className={`shrink-0 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
-                    <span>{typeConfig.icon}</span>
-                    <span>{typeConfig.code}</span>
+                  <span className={`shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-2xs font-semibold ${typeConfig.color.bg} ${typeConfig.color.text} ${typeConfig.color.border}`}>
+                    {typeConfig.code}
                   </span>
                 )}
                 <div className="min-w-0 flex-1">

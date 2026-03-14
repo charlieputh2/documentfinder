@@ -6,7 +6,7 @@ const StatCard = ({ label, value, sublabel, accent, loading }) => (
     className={clsx(
       'rounded-lg border border-white/5 bg-gradient-to-br from-[#1b1c22] to-[#111216] p-3 text-white shadow-lg shadow-black/40 sm:rounded-2xl sm:p-5 touch-manipulation tap-highlight transition-transform hover:scale-105 active:scale-95',
       accent === 'primary' && 'from-primary/10 to-primary/5 border-primary/20',
-      accent === 'quality' && 'from-emerald-400/10 to-emerald-500/5 border-emerald-300/30'
+      accent === 'quality' && 'from-slate-400/10 to-slate-500/5 border-slate-300/30'
     )}
   >
     <p className="text-xs uppercase tracking-[0.35em] text-slate-400">{label}</p>

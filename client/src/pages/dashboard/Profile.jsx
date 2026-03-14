@@ -164,8 +164,8 @@ const Profile = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-400 sm:text-sm">Status</span>
                 <span className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-xs font-semibold text-green-400 sm:text-sm">
+                  <span className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="text-xs font-semibold text-primary sm:text-sm">
                     {profile?.isVerified ? 'Verified' : 'Pending'}
                   </span>
                 </span>
