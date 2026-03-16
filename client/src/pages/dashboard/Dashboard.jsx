@@ -45,6 +45,7 @@ const Dashboard = () => {
   const [editDocument, setEditDocument] = useState(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [selectedType, setSelectedType] = useState('');
 
   const fetchOverview = useCallback(async () => {
     try {
@@ -152,6 +153,7 @@ const Dashboard = () => {
 
   const handleResetFilters = () => {
     setFilters(initialFilters);
+    setSelectedType('');
   };
 
   // Refresh everything after data changes
@@ -345,10 +347,24 @@ const Dashboard = () => {
           overview={overview}
           loading={loadingOverview}
           documents={documents}
-          activeType={filters.documentType}
-          onTypeClick={(type) => handleFilterChange({ documentType: filters.documentType === type ? '' : type, category: '' })}
+          activeType={selectedType}
+          onTypeClick={(type) => {
+            if (selectedType === type) {
+              setSelectedType('');
+              handleFilterChange({ documentType: '', category: '' });
+            } else {
+              setSelectedType(type);
+              handleFilterChange({ documentType: '', category: '' });
+            }
+          }}
           activeCategory={filters.category}
-          onCategoryClick={(cat) => handleFilterChange({ category: filters.category === cat ? '' : cat })}
+          onCategoryClick={(dept) => {
+            if (filters.category === dept) {
+              handleFilterChange({ documentType: '', category: '' });
+            } else {
+              handleFilterChange({ documentType: selectedType, category: dept });
+            }
+          }}
         />
       </div>
 
@@ -375,15 +391,30 @@ const Dashboard = () => {
 
         {/* Main Content - Documents */}
         <div className="space-y-3 sm:space-y-4 md:space-y-6 lg:col-span-3 animate-slideInRight">
-          <RecentDocuments
-            documents={overview?.recentDocuments || []}
-            onPreview={handlePreviewDocument}
-            onDownload={handleDownloadDocument}
-            onEdit={isAdmin ? handleEditDocument : undefined}
-            onDelete={isAdmin ? handleDeleteDocument : undefined}
-            onToggleFavorite={toggleFavorite}
-            isFavorite={isFavorite}
-          />
+          {/* Show prompt when type selected but no department */}
+          {selectedType && !filters.category ? (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-white/5 bg-[#15161b] py-16 px-6 text-center shadow-lg animate-fadeIn">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 mb-4">
+                <svg className="h-7 w-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+              </div>
+              <h3 className="font-heading text-lg text-white sm:text-xl">Select a Department</h3>
+              <p className="mt-2 max-w-sm text-xs text-slate-400 sm:text-sm">
+                Choose a department above to view <span className="font-semibold text-primary">{selectedType}</span> documents for that area.
+              </p>
+            </div>
+          ) : (
+          <>
+          {!selectedType && (
+            <RecentDocuments
+              documents={overview?.recentDocuments || []}
+              onPreview={handlePreviewDocument}
+              onDownload={handleDownloadDocument}
+              onEdit={isAdmin ? handleEditDocument : undefined}
+              onDelete={isAdmin ? handleDeleteDocument : undefined}
+              onToggleFavorite={toggleFavorite}
+              isFavorite={isFavorite}
+            />
+          )}
           <DocumentTable
             documents={documents}
             loading={loadingDocuments}
@@ -399,6 +430,8 @@ const Dashboard = () => {
             onToggleFavorite={toggleFavorite}
             isFavorite={isFavorite}
           />
+          </>
+          )}
         </div>
       </div>
 

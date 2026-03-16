@@ -1702,349 +1702,85 @@ const CLOUDINARY_DOCX_1 = 'https://res.cloudinary.com/dtr1tnutd/raw/upload/v1763
 const CLOUDINARY_PDF_1 = 'https://res.cloudinary.com/dtr1tnutd/raw/upload/test_document_3_gtadth.pdf';
 const CLOUDINARY_DOCX_2 = 'https://res.cloudinary.com/dtr1tnutd/raw/upload/v1763998602/hwv8b6bqll7ydgfecmhd.docx';
 
-const SAMPLES = [
-  // ── MN: Manufacturing Notices ──
-  {
-    title: 'Line Shutdown Notice - Battery Module Line 4',
-    description: 'Planned shutdown for equipment upgrade and recalibration on Line 4.',
-    documentType: 'MN',
-    category: 'Battery Module',
-    tags: ['battery', 'shutdown', 'maintenance', 'line-4'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'mn_line_shutdown_001',
-    textContent: MN_TEXT_1
-  },
-  {
-    title: 'Material Change Notice - Thermal Interface',
-    description: 'Thermal interface material supplier change notification and process updates.',
-    documentType: 'MN',
-    category: 'Battery Pack',
-    tags: ['material-change', 'thermal', 'supplier'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'mn_material_change_002',
-    textContent: MN_TEXT_2
-  },
-  {
-    title: 'Shift Schedule Change - Stamping Plant',
-    description: 'Updated shift rotation schedule for stamping plant effective April 2024.',
-    documentType: 'MN',
-    category: 'Drive Unit',
-    tags: ['shift-change', 'stamping', 'schedule'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'mn_shift_schedule_003',
-    textContent: MN_TEXT_3
-  },
-  {
-    title: 'New Equipment Installation - CNC Mill Bay 7',
-    description: 'Notice for new 5-axis CNC milling center installation in Bay 7.',
-    documentType: 'MN',
-    category: 'Energy',
-    tags: ['equipment', 'cnc', 'installation', 'bay-7'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'mn_cnc_install_004',
-    textContent: MN_TEXT_4
-  },
-  {
-    title: 'Production Ramp-Up Plan - Cybertruck Line',
-    description: 'Phase 2 ramp-up timeline and milestones for Cybertruck production.',
-    documentType: 'MN',
-    category: 'Semi',
-    tags: ['ramp-up', 'cybertruck', 'capacity', 'milestones'],
-    version: '2.0.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'mn_ramp_up_005',
-    textContent: MN_TEXT_5
-  },
 
-  // ── MI: Manufacturing Instructions ──
-  {
-    title: 'Battery Pack Final Assembly Procedure',
-    description: 'Step-by-step instructions for Model 3/Y battery pack final assembly.',
-    documentType: 'MI',
-    category: 'Battery Pack',
-    tags: ['battery', 'assembly', 'torque', 'procedure'],
-    version: '3.2.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'mi_battery_assembly_001',
-    textContent: MI_TEXT_1
-  },
-  {
-    title: 'Front Fascia Installation Instructions',
-    description: 'General assembly instructions for front fascia installation at Station 14.',
-    documentType: 'MI',
-    category: 'Power Wall',
-    tags: ['general-assembly', 'fascia', 'installation'],
-    version: '2.0.1',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'mi_fascia_install_002',
-    textContent: MI_TEXT_2
-  },
-  {
-    title: 'Drive Unit Assembly Procedure',
-    description: 'Complete assembly procedure for front and rear drive unit installation.',
-    documentType: 'MI',
-    category: 'Drive Unit',
-    tags: ['drive-unit', 'assembly', 'motor', 'procedure'],
-    version: '1.4.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'mi_drive_unit_003',
-    textContent: MI_TEXT_3
-  },
-  {
-    title: 'Paint Booth Operation Manual',
-    description: 'Standard operating procedure for automated paint booth Lines 1-3.',
-    documentType: 'MI',
-    category: 'Mega Pack',
-    tags: ['paint', 'booth', 'operation', 'automation'],
-    version: '3.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'mi_paint_booth_004',
-    textContent: MI_TEXT_4
-  },
-  {
-    title: 'Wiring Harness Installation Guide',
-    description: 'Step-by-step instructions for main body wiring harness routing and connection.',
-    documentType: 'MI',
-    category: 'PCS',
-    tags: ['wiring', 'harness', 'installation', 'routing'],
-    version: '2.1.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'mi_wiring_harness_005',
-    textContent: MI_TEXT_5
-  },
+const FILE_URLS = [CLOUDINARY_PDF_1, CLOUDINARY_DOCX_1, CLOUDINARY_DOCX_2];
+const DEPT_LIST = ['Battery Module', 'Battery Pack', 'Drive Unit', 'Energy', 'Mega Pack', 'Power Wall', 'PCS', 'Semi'];
 
-  // ── QI: Quality Instructions ──
-  {
-    title: 'Battery Cell Incoming Inspection',
-    description: 'Incoming inspection requirements for 2170 and 4680 battery cells.',
-    documentType: 'QI',
-    category: 'Battery Module',
-    tags: ['inspection', 'battery-cell', 'incoming', 'AQL'],
-    version: '4.1.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'qi_cell_inspection_001',
-    textContent: QI_TEXT_1
+const TYPE_SEED_DATA = {
+  MN: {
+    texts: [MN_TEXT_1, MN_TEXT_2, MN_TEXT_3, MN_TEXT_4, MN_TEXT_5],
+    suffixes: [
+      'Line Shutdown Notice', 'Material Change Alert', 'Shift Schedule Update',
+      'Equipment Installation', 'Ramp-Up Plan', 'Safety Protocol Update',
+      'Tooling Changeover Notice', 'Maintenance Window Alert'
+    ],
+    baseTags: ['manufacturing', 'notice']
   },
-  {
-    title: 'Weld Quality Verification Procedure',
-    description: 'In-process inspection criteria for ultrasonic and laser welds.',
-    documentType: 'QI',
-    category: 'Drive Unit',
-    tags: ['welding', 'inspection', 'ultrasonic', 'laser'],
-    version: '2.3.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'qi_weld_quality_002',
-    textContent: QI_TEXT_2
+  MI: {
+    texts: [MI_TEXT_1, MI_TEXT_2, MI_TEXT_3, MI_TEXT_4, MI_TEXT_5],
+    suffixes: [
+      'Assembly Procedure', 'Installation Guide', 'Operation Manual',
+      'Calibration Steps', 'Testing Protocol', 'Setup Instructions',
+      'Maintenance Procedure', 'Changeover Guide'
+    ],
+    baseTags: ['manufacturing', 'instructions']
   },
-  {
-    title: 'Paint Quality Inspection Standards',
-    description: 'Color match, orange peel, and defect classification for all paint operations.',
-    documentType: 'QI',
-    category: 'Energy',
-    tags: ['paint', 'inspection', 'color-match', 'defect'],
-    version: '5.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'qi_paint_quality_003',
-    textContent: QI_TEXT_3
+  QI: {
+    texts: [QI_TEXT_1, QI_TEXT_2, QI_TEXT_3, QI_TEXT_4, QI_TEXT_5],
+    suffixes: [
+      'Incoming Inspection', 'Weld Quality Check', 'Paint Inspection Standards',
+      'Audit Checklist', 'Validation Procedure', 'Dimensional Check',
+      'Functional Test', 'Material Verification'
+    ],
+    baseTags: ['quality', 'inspection']
   },
-  {
-    title: 'Final Vehicle Audit Checklist',
-    description: 'Comprehensive end-of-line audit checklist for all vehicle programs.',
-    documentType: 'QI',
-    category: 'Semi',
-    tags: ['audit', 'final-inspection', 'checklist', 'vehicle'],
-    version: '3.1.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'qi_final_audit_004',
-    textContent: QI_TEXT_4
+  QAN: {
+    texts: [QAN_TEXT_1, QAN_TEXT_2, QAN_TEXT_3, QAN_TEXT_4, QAN_TEXT_5],
+    suffixes: [
+      'Torque Non-Conformance', 'Material Deviation Alert', 'Defect Cluster Alert',
+      'Fastener Recall Notice', 'Calibration Error Report', 'Weld Defect Alert',
+      'Surface Finish Issue', 'Assembly Gap Alert'
+    ],
+    baseTags: ['quality', 'alert']
   },
-  {
-    title: 'Supplier Part Validation (PPAP) Procedure',
-    description: 'PPAP submission requirements and validation criteria for new supplier parts.',
-    documentType: 'QI',
-    category: 'Battery Pack',
-    tags: ['ppap', 'supplier', 'validation', 'incoming'],
-    version: '2.0.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'qi_ppap_validation_005',
-    textContent: QI_TEXT_5
+  VA: {
+    texts: [VA_TEXT_1, VA_TEXT_2, VA_TEXT_3, VA_TEXT_4, VA_TEXT_5],
+    suffixes: [
+      'Connector ID Guide', 'PPE Requirements', 'Torque Sequence Diagram',
+      'Fluid Fill Chart', 'Error Code Reference', 'Assembly Diagram',
+      'Routing Map', 'Inspection Points'
+    ],
+    baseTags: ['visual', 'reference']
   },
-
-  // ── QAN: Quality Alert Notices ──
-  {
-    title: 'CRITICAL: Torque Specification Non-Conformance',
-    description: 'Red alert for torque tool calibration drift on Line 2 bus bar connections.',
-    documentType: 'QAN',
-    category: 'Battery Module',
-    tags: ['alert', 'torque', 'calibration', 'critical'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'qan_torque_alert_001',
-    textContent: QAN_TEXT_1
-  },
-  {
-    title: 'WARNING: Coolant Hose Material Deviation',
-    description: 'Yellow alert for dimensional variation in incoming coolant hose lot.',
-    documentType: 'QAN',
-    category: 'Power Wall',
-    tags: ['alert', 'supplier', 'coolant', 'deviation'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'qan_coolant_hose_002',
-    textContent: QAN_TEXT_2
-  },
-  {
-    title: 'ALERT: Paint Defect Cluster - Line 2 Booth',
-    description: 'Orange alert for elevated paint defect rate in Line 2 spray booth.',
-    documentType: 'QAN',
-    category: 'Mega Pack',
-    tags: ['alert', 'paint', 'defect', 'cluster'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'qan_paint_defect_003',
-    textContent: QAN_TEXT_3
-  },
-  {
-    title: 'CRITICAL: Fastener Lot Recall - Supplier XM',
-    description: 'Red alert for non-conforming fastener lot requiring immediate containment.',
-    documentType: 'QAN',
-    category: 'PCS',
-    tags: ['alert', 'fastener', 'recall', 'critical', 'containment'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'qan_fastener_recall_004',
-    textContent: QAN_TEXT_4
-  },
-  {
-    title: 'WARNING: Software Calibration Error - ABS Module',
-    description: 'Yellow alert for incorrect calibration data in ABS control module batch.',
-    documentType: 'QAN',
-    category: 'Semi',
-    tags: ['alert', 'software', 'calibration', 'abs', 'module'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'qan_software_cal_005',
-    textContent: QAN_TEXT_5
-  },
-
-  // ── VA: Visual Aides ──
-  {
-    title: 'Battery Module Connector ID Guide',
-    description: 'Color-coded connector identification and routing reference for assembly.',
-    documentType: 'VA',
-    category: 'Battery Module',
-    tags: ['visual-aide', 'connector', 'routing', 'color-code'],
-    version: '1.5.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'va_connector_guide_001',
-    textContent: VA_TEXT_1
-  },
-  {
-    title: 'PPE Requirements by Work Zone',
-    description: 'Quick reference for PPE requirements in each factory work zone.',
-    documentType: 'VA',
-    category: 'Energy',
-    tags: ['visual-aide', 'ppe', 'safety', 'zones'],
-    version: '2.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'va_ppe_guide_002',
-    textContent: VA_TEXT_2
-  },
-  {
-    title: 'Torque Sequence Diagram - Subframe Assembly',
-    description: 'Visual guide for correct bolt torque sequence on front subframe.',
-    documentType: 'VA',
-    category: 'Drive Unit',
-    tags: ['visual-aide', 'torque', 'sequence', 'subframe'],
-    version: '1.2.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'va_torque_sequence_003',
-    textContent: VA_TEXT_3
-  },
-  {
-    title: 'Fluid Fill Point Identification Chart',
-    description: 'Location and color-coded identification of all fluid fill points on vehicle.',
-    documentType: 'VA',
-    category: 'Battery Pack',
-    tags: ['visual-aide', 'fluid-fill', 'identification', 'chart'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'va_fluid_fill_004',
-    textContent: VA_TEXT_4
-  },
-  {
-    title: 'Diagnostic Error Code Quick Reference',
-    description: 'Visual quick-reference card for common DTC codes and resolution steps.',
-    documentType: 'VA',
-    category: 'PCS',
-    tags: ['visual-aide', 'diagnostic', 'dtc', 'error-codes'],
-    version: '3.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'va_dtc_reference_005',
-    textContent: VA_TEXT_5
-  },
-
-  // ── PCA: Process Change Approvals ──
-  {
-    title: 'Weld Parameter Optimization - Ultrasonic',
-    description: 'Approved process change for ultrasonic welding parameter optimization.',
-    documentType: 'PCA',
-    category: 'Mega Pack',
-    tags: ['process-change', 'welding', 'optimization', 'approved'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'pca_weld_params_001',
-    textContent: PCA_TEXT_1
-  },
-  {
-    title: 'Line Speed Increase - GA Line 1',
-    description: 'Process change request to increase GA Line 1 from 52 to 58 JPH.',
-    documentType: 'PCA',
-    category: 'Power Wall',
-    tags: ['process-change', 'line-speed', 'capacity', 'pending'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'pca_line_speed_002',
-    textContent: PCA_TEXT_2
-  },
-  {
-    title: 'New Structural Adhesive Introduction',
-    description: 'Approval for new structural adhesive replacing spot welds on rear quarter panel.',
-    documentType: 'PCA',
-    category: 'Semi',
-    tags: ['process-change', 'adhesive', 'structural', 'approved'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_1,
-    filePublicId: 'pca_adhesive_003',
-    textContent: PCA_TEXT_3
-  },
-  {
-    title: 'Automated Vision Inspection Deployment',
-    description: 'Process change to add AI-powered vision inspection at end-of-line station.',
-    documentType: 'PCA',
-    category: 'Battery Module',
-    tags: ['process-change', 'vision', 'inspection', 'automation'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_PDF_1,
-    filePublicId: 'pca_vision_inspect_004',
-    textContent: PCA_TEXT_4
-  },
-  {
-    title: 'Packaging Method Change - Battery Modules',
-    description: 'Updated packaging and shipping method for battery modules to reduce damage.',
-    documentType: 'PCA',
-    category: 'Battery Pack',
-    tags: ['process-change', 'packaging', 'battery', 'shipping'],
-    version: '1.0.0',
-    fileUrl: CLOUDINARY_DOCX_2,
-    filePublicId: 'pca_packaging_005',
-    textContent: PCA_TEXT_5
+  PCA: {
+    texts: [PCA_TEXT_1, PCA_TEXT_2, PCA_TEXT_3, PCA_TEXT_4, PCA_TEXT_5],
+    suffixes: [
+      'Weld Parameter Update', 'Line Speed Increase', 'Adhesive Introduction',
+      'Vision Inspection Deploy', 'Packaging Change', 'Robot Program Update',
+      'Fixture Modification', 'Material Substitution'
+    ],
+    baseTags: ['process-change', 'approval']
   }
-];
+};
+
+// Generate one document per type × department = 48 total
+const SAMPLES = [];
+for (const [type, data] of Object.entries(TYPE_SEED_DATA)) {
+  DEPT_LIST.forEach((dept, i) => {
+    const deptSlug = dept.toLowerCase().replace(/\s+/g, '-');
+    SAMPLES.push({
+      title: `${dept} - ${data.suffixes[i]}`,
+      description: `${data.suffixes[i]} for the ${dept} department.`,
+      documentType: type,
+      category: dept,
+      tags: [...data.baseTags, deptSlug],
+      version: `${Math.floor(i / 3) + 1}.${i % 3}.0`,
+      fileUrl: FILE_URLS[i % FILE_URLS.length],
+      filePublicId: `${type.toLowerCase()}_${deptSlug.replace(/-/g, '_')}_${String(i + 1).padStart(3, '0')}`,
+      textContent: data.texts[i % data.texts.length]
+    });
+  });
+}
 
 const extensionToMime = {
   pdf: 'application/pdf',
