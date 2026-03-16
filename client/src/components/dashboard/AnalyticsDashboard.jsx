@@ -240,6 +240,7 @@ const AnalyticsDashboard = ({
           const match = analytics.typeBreakdown.find((t) => t.code === dt.code);
           const count = match?.count ?? 0;
           const isActive = activeType === dt.code;
+          const hasActive = !!activeType;
 
           return (
             <button
@@ -248,8 +249,10 @@ const AnalyticsDashboard = ({
               onClick={() => onTypeClick?.(dt.code)}
               className={`group relative flex flex-col items-center rounded-xl border p-2.5 transition-all duration-200 touch-manipulation sm:rounded-2xl sm:p-3.5
                 ${isActive
-                  ? `border-primary/40 bg-primary/10 ring-1 ring-primary/50 shadow-lg shadow-primary/5`
-                  : `${dt.color.bg} ${dt.color.border} hover:bg-white/[0.06] hover:border-white/15 active:scale-95`
+                  ? 'border-primary/50 bg-primary/10 ring-2 ring-primary/40 shadow-lg shadow-primary/10'
+                  : hasActive
+                    ? 'border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 active:scale-95 opacity-50 hover:opacity-80'
+                    : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/10 active:scale-95'
                 }`}
             >
               {isActive && (
@@ -258,15 +261,12 @@ const AnalyticsDashboard = ({
                 </span>
               )}
               {Icon && (
-                <Icon
-                  className={`h-4 w-4 transition-all duration-200 group-hover:scale-110 sm:h-5 sm:w-5
-                    ${isActive ? 'text-primary' : dt.color.text}`}
-                />
+                <Icon className={`h-4 w-4 transition-all duration-200 group-hover:scale-110 sm:h-5 sm:w-5 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
               )}
-              <span className={`mt-1 text-2xs font-bold sm:text-xs ${isActive ? 'text-primary' : dt.color.text}`}>
+              <span className={`mt-1 text-2xs font-bold sm:text-xs ${isActive ? 'text-primary' : 'text-slate-400'}`}>
                 {dt.code}
               </span>
-              <span className={`font-heading text-lg leading-none sm:text-xl ${isActive ? 'text-white' : dt.color.text}`}>
+              <span className={`font-heading text-lg leading-none sm:text-xl ${isActive ? 'text-white' : 'text-slate-300'}`}>
                 {count}
               </span>
             </button>
@@ -276,46 +276,46 @@ const AnalyticsDashboard = ({
 
       {/* ── Department Picker ──────────────────────────────────────── */}
       {activeType && (
-        <div className="overflow-hidden rounded-xl border border-white/5 bg-[#15161b] shadow-lg shadow-black/30 sm:rounded-2xl animate-slide-up">
-          <div className="flex items-center justify-between border-b border-white/5 px-3 py-2 sm:px-4 sm:py-2.5">
+        <div className="rounded-xl border border-white/5 bg-[#13141a] shadow-lg shadow-black/30 sm:rounded-2xl animate-slide-up">
+          <div className="flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3">
             <div className="flex items-center gap-2">
-              <span className={`inline-flex rounded border px-1.5 py-px text-3xs font-bold sm:text-2xs ${activeTypeConfig?.color.bg} ${activeTypeConfig?.color.text} ${activeTypeConfig?.color.border}`}>
+              <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-2xs font-bold text-primary sm:text-xs">
                 {activeType}
               </span>
-              <span className="text-2xs text-slate-400 sm:text-xs">Select Department</span>
+              <ChevronRight className="h-3 w-3 text-slate-600" />
+              <span className="text-2xs text-slate-400 sm:text-xs">
+                {activeCategory || 'Select a department'}
+              </span>
             </div>
             {activeCategory && (
               <button
                 type="button"
                 onClick={() => onCategoryClick?.('')}
-                className="flex items-center gap-1 text-2xs text-slate-500 transition hover:text-white sm:text-xs"
+                className="flex items-center gap-1 rounded-md border border-white/5 bg-white/[0.03] px-2 py-0.5 text-2xs text-slate-500 transition hover:bg-white/[0.06] hover:text-white sm:text-xs"
               >
                 Clear
                 <X className="h-3 w-3" />
               </button>
             )}
           </div>
-          <div className="grid grid-cols-4 gap-px bg-white/[0.02] sm:grid-cols-8">
+          <div className="grid grid-cols-4 gap-1.5 px-3 pb-3 sm:grid-cols-8 sm:gap-2 sm:px-4 sm:pb-4">
             {DEPARTMENTS.map((dept) => {
               const DeptIcon = dept.icon;
-              const isActive = activeCategory === dept.key;
+              const isDeptActive = activeCategory === dept.key;
 
               return (
                 <button
                   key={dept.key}
                   type="button"
-                  onClick={() => onCategoryClick?.(isActive ? '' : dept.key)}
-                  className={`group flex flex-col items-center justify-center gap-0.5 py-3 transition-all duration-150 touch-manipulation sm:gap-1 sm:py-4
-                    ${isActive
-                      ? 'bg-primary/12 text-primary'
-                      : 'bg-transparent text-slate-500 hover:bg-white/[0.04] hover:text-slate-200'
+                  onClick={() => onCategoryClick?.(isDeptActive ? '' : dept.key)}
+                  className={`group flex flex-col items-center gap-1 rounded-lg border p-2 transition-all duration-150 touch-manipulation sm:rounded-xl sm:p-3
+                    ${isDeptActive
+                      ? 'border-primary/40 bg-primary/10 text-primary shadow-md shadow-primary/5'
+                      : 'border-white/5 bg-white/[0.02] text-slate-500 hover:border-white/10 hover:bg-white/[0.05] hover:text-white active:scale-95'
                     }`}
                 >
-                  <DeptIcon className={`h-4 w-4 transition-transform duration-150 group-hover:scale-110 sm:h-5 sm:w-5 ${isActive ? 'text-primary' : ''}`} />
-                  <span className="text-center text-[0.5rem] font-medium leading-tight sm:text-2xs">{dept.label}</span>
-                  {isActive && (
-                    <span className="mt-0.5 h-0.5 w-3 rounded-full bg-primary sm:w-4" />
-                  )}
+                  <DeptIcon className={`h-4 w-4 transition-transform duration-150 group-hover:scale-110 sm:h-5 sm:w-5 ${isDeptActive ? 'text-primary' : ''}`} />
+                  <span className="text-center text-[0.55rem] font-medium leading-tight sm:text-2xs">{dept.label}</span>
                 </button>
               );
             })}

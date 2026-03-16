@@ -370,7 +370,7 @@ const Dashboard = () => {
               categorySuggestions={categories}
             />
           )}
-          <ActivityFeed />
+          {isAdmin && <ActivityFeed />}
         </div>
 
         {/* Main Content - Documents */}
