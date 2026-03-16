@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   Bell, ClipboardList, ShieldCheck, AlertTriangle, Eye, FileCheck2,
   ExternalLink, Battery, Box, Cog, Zap, Container, Home, Cpu, Truck,
-  X, ChevronRight
+  X, ChevronRight, BookOpen, Database, ShieldAlert, Wrench, Users
 } from 'lucide-react';
 import { DOCUMENT_TYPES, getDocumentTypeConfig } from '../../constants/documentTypes.js';
 
@@ -28,7 +28,7 @@ const DEPARTMENTS = [
   { key: 'Semi', label: 'Semi', abbr: 'SM', icon: Truck }
 ];
 
-/* ── Jira SVG ──────────────────────────────────────────────────────── */
+/* ── SVG Icons ─────────────────────────────────────────────────────── */
 
 const JiraIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -38,6 +38,22 @@ const JiraIcon = ({ className }) => (
   </svg>
 );
 
+const ConfluenceIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M2.04 18.43c-.29.47-.57 1-.57 1a.52.52 0 00.2.7l3.12 1.93a.52.52 0 00.72-.18s.47-.82.99-1.64c1.67-2.63 3.34-2.12 6.35-.67l3.07 1.47a.52.52 0 00.7-.24l1.43-3.36a.52.52 0 00-.26-.68s-1.51-.72-3.07-1.47C9.13 11.67 4.71 14.1 2.04 18.43z" />
+    <path d="M21.96 5.57c.29-.47.57-1 .57-1a.52.52 0 00-.2-.7L19.2 1.94a.52.52 0 00-.72.18s-.47.82-.99 1.64c-1.67 2.63-3.34 2.12-6.35.67L8.07 2.96a.52.52 0 00-.7.24L5.94 6.56a.52.52 0 00.26.68s1.51.72 3.07 1.47c5.5 2.63 9.92.2 12.69-3.14z" />
+  </svg>
+);
+
+const QUICK_LINKS = [
+  { key: 'jira', label: 'JIRA', icon: JiraIcon, color: '#2684FF', url: 'https://jira.atlassian.net' },
+  { key: 'confluence', label: 'Confluence', icon: ConfluenceIcon, color: '#1868DB', url: 'https://confluence.atlassian.net' },
+  { key: 'sql', label: 'SQL Script', icon: Database, color: '#F59E0B', url: '#' },
+  { key: 'containment', label: 'Containment', icon: ShieldAlert, color: '#EF4444', url: '#' },
+  { key: 'engineering', label: 'Engineering', icon: Wrench, color: '#10B981', url: '#' },
+  { key: 'leadership', label: 'Leadership', icon: Users, color: '#8B5CF6', url: '#' }
+];
+
 /* ── Component ─────────────────────────────────────────────────────── */
 
 const AnalyticsDashboard = ({
@@ -46,8 +62,7 @@ const AnalyticsDashboard = ({
   activeType = '',
   onTypeClick,
   activeCategory = '',
-  onCategoryClick,
-  jiraUrl = ''
+  onCategoryClick
 }) => {
   const analytics = useMemo(() => {
     if (!overview) return null;
@@ -103,21 +118,36 @@ const AnalyticsDashboard = ({
     <section className="space-y-3 sm:space-y-4 md:space-y-5">
 
       {/* ── Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-2xs uppercase tracking-[0.3em] text-primary/70 sm:text-xs">Analytics</p>
-          <h2 className="font-heading text-lg text-white sm:text-2xl">Real-time insights</h2>
+      <div>
+        <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
+          <div className="min-w-0">
+            <p className="text-2xs uppercase tracking-[0.3em] text-primary/70 sm:text-xs">Analytics</p>
+            <h2 className="font-heading text-lg text-white sm:text-2xl">Real-time insights</h2>
+          </div>
         </div>
-        <a
-          href={jiraUrl || 'https://jira.atlassian.net'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex shrink-0 items-center gap-1.5 rounded-lg border border-[#2684FF]/25 bg-[#2684FF]/8 px-2.5 py-1.5 text-2xs font-semibold text-[#2684FF] transition-all hover:bg-[#2684FF]/15 hover:border-[#2684FF]/40 active:scale-95 sm:gap-2 sm:rounded-xl sm:px-4 sm:py-2 sm:text-xs touch-manipulation"
-        >
-          <JiraIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          <span className="hidden xs:inline">JIRA</span>
-          <ExternalLink className="h-2.5 w-2.5 opacity-50 sm:h-3 sm:w-3" />
-        </a>
+
+        {/* Quick Links Toolbar */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide sm:gap-2">
+          {QUICK_LINKS.map((link, idx) => {
+            const LinkIcon = link.icon;
+            return (
+              <a
+                key={link.key}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ animationDelay: `${idx * 50}ms`, borderColor: `${link.color}20`, backgroundColor: `${link.color}08` }}
+                className="group flex shrink-0 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-2xs font-semibold transition-all duration-200 hover:shadow-md active:scale-95 sm:gap-2 sm:rounded-xl sm:px-3.5 sm:py-2 sm:text-xs touch-manipulation animate-scale-in"
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = `${link.color}18`; e.currentTarget.style.borderColor = `${link.color}40`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = `${link.color}08`; e.currentTarget.style.borderColor = `${link.color}20`; }}
+              >
+                <LinkIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform duration-200 group-hover:scale-110" style={{ color: link.color }} />
+                <span className="whitespace-nowrap" style={{ color: link.color }}>{link.label}</span>
+                <ExternalLink className="h-2.5 w-2.5 opacity-40 sm:h-3 sm:w-3" style={{ color: link.color }} />
+              </a>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Active Filter Breadcrumb ───────────────────────────────── */}
