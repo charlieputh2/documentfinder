@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { SkeletonStats } from '../common/Skeleton.jsx';
 
-const StatCard = ({ label, value, sublabel, accent, loading }) => (
+const StatCard = ({ label, value, sublabel, accent, loading, delay = 0 }) => (
   <div
+    style={{ animationDelay: `${delay}ms` }}
     className={clsx(
-      'rounded-lg border border-white/5 bg-gradient-to-br from-[#1b1c22] to-[#111216] p-3 text-white shadow-lg shadow-black/40 sm:rounded-2xl sm:p-5 touch-manipulation tap-highlight transition-transform hover:scale-105 active:scale-95',
+      'rounded-lg border border-white/5 bg-gradient-to-br from-[#1b1c22] to-[#111216] p-3 text-white shadow-lg shadow-black/40 sm:rounded-2xl sm:p-5 touch-manipulation tap-highlight transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95 animate-stagger-up',
       accent === 'primary' && 'from-primary/10 to-primary/5 border-primary/20',
       accent === 'quality' && 'from-slate-400/10 to-slate-500/5 border-slate-300/30'
     )}
@@ -41,12 +42,14 @@ const StatsGrid = ({ overview, loading }) => (
             sublabel={`${overview?.categoryBreakdown?.length ?? 0} categories`}
             accent="primary"
             loading={loading}
+            delay={0}
           />
           <StatCard
             label="Manufacturing"
             value={overview?.totals?.manufacturingCount ?? 0}
             sublabel="MN + MI documents"
             loading={loading}
+            delay={100}
           />
           <StatCard
             label="Quality"
@@ -54,15 +57,17 @@ const StatsGrid = ({ overview, loading }) => (
             sublabel="QI + QAN documents"
             accent="quality"
             loading={loading}
+            delay={200}
           />
         </div>
 
         {overview?.categoryBreakdown?.length ? (
           <div className="mt-3 flex flex-wrap gap-1 text-xs text-slate-300 sm:mt-5 sm:gap-2">
-            {overview.categoryBreakdown.slice(0, 6).map((item) => (
+            {overview.categoryBreakdown.slice(0, 6).map((item, idx) => (
               <span
                 key={item.category}
-                className="rounded-full border border-white/10 bg-white/5 px-2 py-1 sm:px-3 touch-manipulation tap-highlight transition-transform hover:scale-105 active:scale-95"
+                style={{ animationDelay: `${300 + idx * 60}ms` }}
+                className="rounded-full border border-white/10 bg-white/5 px-2 py-1 sm:px-3 touch-manipulation tap-highlight transition-all duration-300 hover:scale-105 hover:border-primary/30 hover:bg-primary/5 active:scale-95 animate-stagger-up"
               >
                 {item.category} · {item.count}
               </span>

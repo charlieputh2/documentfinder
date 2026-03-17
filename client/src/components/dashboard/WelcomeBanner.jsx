@@ -25,7 +25,7 @@ const WelcomeBanner = ({ overview, onOpenSearch }) => {
   };
 
   return (
-    <div className="rounded-2xl border border-white/5 bg-gradient-to-r from-primary/10 via-[#15161b] to-[#15161b] p-4 sm:p-6">
+    <div className="rounded-2xl border border-white/5 bg-gradient-to-r from-primary/10 via-[#15161b] to-[#15161b] p-4 sm:p-6 animate-fadeIn">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-xl text-white sm:text-2xl lg:text-3xl">

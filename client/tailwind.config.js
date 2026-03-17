@@ -53,7 +53,9 @@ export default {
         'scale-in': 'scaleIn 0.2s ease-out',
         'bounce-gentle': 'bounceGentle 0.6s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2s linear infinite'
+        'shimmer': 'shimmer 2s linear infinite',
+        'ql-panel': 'qlPanel 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+        'stagger-up': 'staggerUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards'
       },
       keyframes: {
         fadeIn: {
@@ -89,6 +91,14 @@ export default {
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' }
+        },
+        qlPanel: {
+          '0%': { opacity: '0', transform: 'translateY(-8px) scaleY(0.97)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scaleY(1)' }
+        },
+        staggerUp: {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
         }
       },
       boxShadow: {

@@ -38,7 +38,7 @@ DOCUMENT TYPES IN THE SYSTEM:
 - [MI] Manufacturing Instructions — Step-by-step procedures
 - [QI] Quality Instructions — Quality control procedures
 - [QAN] Quality Alert Notice — Urgent quality alerts
-- [VA] Visual Aide — Visual reference guides
+- [VA] Visual Aid — Visual reference guides
 - [PCA] Process Change Approval — Change request approvals
 
 HOW TO RESPOND:

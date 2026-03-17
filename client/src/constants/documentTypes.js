@@ -62,7 +62,7 @@ export const DOCUMENT_TYPES = {
   },
   VA: {
     code: 'VA',
-    name: 'Visual Aide',
+    name: 'Visual Aid',
     description: 'Visual references, diagrams, and instructional images',
     color: {
       bg: 'bg-slate-500/10',
