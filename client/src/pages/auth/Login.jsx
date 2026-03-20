@@ -14,96 +14,97 @@ const loginStyles = `
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transition: opacity 1.5s ease-in-out;
+  transition: opacity 2s ease-in-out;
 }
 
-/* ===== TESLA CAR — SMOOTH BORDER DRIVE ===== */
-@keyframes drive-circuit {
-  0%      { left: -70px; top: -20px;  transform: rotate(0deg); }
-  2%      { left: -50px; top: -20px;  transform: rotate(0deg); }
-  25%     { left: calc(100% + 10px); top: -20px; transform: rotate(0deg); }
-  25.1%   { left: calc(100% + 10px); top: -20px; transform: rotate(0deg); }
-  27%     { left: calc(100% - 30px); top: 10px; transform: rotate(90deg); }
-  48%     { left: calc(100% - 30px); top: calc(100% + 5px); transform: rotate(90deg); }
-  50%     { left: calc(100% - 10px); top: calc(100% - 5px); transform: rotate(180deg); }
-  75%     { left: -70px; top: calc(100% - 5px); transform: rotate(180deg); }
-  77%     { left: -50px; top: calc(100% - 20px); transform: rotate(270deg); }
-  98%     { left: -50px; top: -20px; transform: rotate(270deg); }
-  100%    { left: -70px; top: -20px; transform: rotate(0deg); }
+.bg-slide.active {
+  animation: bg-zoom 6s ease-in-out forwards;
+}
+
+@keyframes bg-zoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* ===== TESLA CAR — HORIZONTAL DRIVE ONLY (NO ROTATION) ===== */
+/* Car drives left-to-right along the top, then right-to-left along the bottom */
+/* It stays flat — only flips horizontally when reversing direction */
+
+@keyframes car-drive {
+  /* Start off-screen left, drive right across the top */
+  0%   { left: -80px; top: -18px; transform: scaleX(1); }
+  45%  { left: calc(100% + 10px); top: -18px; transform: scaleX(1); }
+  /* Teleport to bottom-right, face left */
+  45.1% { left: calc(100% + 10px); top: calc(100% - 12px); transform: scaleX(-1); }
+  /* Drive left across the bottom */
+  90%  { left: -80px; top: calc(100% - 12px); transform: scaleX(-1); }
+  /* Teleport back to top-left, face right */
+  90.1% { left: -80px; top: -18px; transform: scaleX(1); }
+  100% { left: -80px; top: -18px; transform: scaleX(1); }
 }
 
 .tesla-car {
   position: absolute;
-  width: clamp(50px, 8vw, 80px);
+  width: clamp(55px, 9vw, 85px);
   height: auto;
   z-index: 50;
   pointer-events: none;
-  filter: drop-shadow(0 0 15px rgba(232, 33, 39, 0.6))
-          drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-  animation: drive-circuit 10s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(232, 33, 39, 0.5))
+          drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+  animation: car-drive 8s ease-in-out infinite;
 }
 
-/* Headlight glow that follows the car */
-.tesla-car-glow {
+/* Red tail light trail */
+.car-trail {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
+  width: clamp(30px, 5vw, 50px);
+  height: 2px;
   z-index: 49;
-  animation: drive-circuit 10s linear infinite;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(232, 33, 39, 0.5));
+  border-radius: 1px;
+  animation: car-drive 8s ease-in-out infinite;
+  filter: blur(1px);
 }
 
-/* ===== OPTIMUS ROBOT — FULL DANCE ===== */
+/* ===== OPTIMUS ROBOT DANCE ===== */
 @keyframes robot-dance {
-  0%   { transform: translateY(0) rotate(0deg) scale(1); }
-  8%   { transform: translateY(-8px) rotate(-4deg) scale(1.02); }
-  16%  { transform: translateY(2px) rotate(3deg) scale(0.98); }
-  24%  { transform: translateY(-12px) rotate(0deg) scale(1.04); }
-  32%  { transform: translateY(0) rotate(-3deg) scale(1); }
-  40%  { transform: translateY(-6px) rotate(5deg) scale(1.01); }
-  48%  { transform: translateY(3px) rotate(-2deg) scale(0.97); }
-  56%  { transform: translateY(-10px) rotate(0deg) scale(1.03); }
-  64%  { transform: translateY(0) rotate(4deg) scale(1); }
-  72%  { transform: translateY(-5px) rotate(-5deg) scale(1.02); }
-  80%  { transform: translateY(2px) rotate(2deg) scale(0.99); }
-  88%  { transform: translateY(-8px) rotate(0deg) scale(1.01); }
-  100% { transform: translateY(0) rotate(0deg) scale(1); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  10%  { transform: translateY(-6px) rotate(-3deg); }
+  20%  { transform: translateY(0) rotate(2deg); }
+  30%  { transform: translateY(-10px) rotate(0deg); }
+  40%  { transform: translateY(0) rotate(-2deg); }
+  50%  { transform: translateY(-4px) rotate(3deg); }
+  60%  { transform: translateY(0) rotate(0deg); }
+  70%  { transform: translateY(-8px) rotate(-2deg); }
+  80%  { transform: translateY(0) rotate(2deg); }
+  90%  { transform: translateY(-5px) rotate(0deg); }
 }
 
-@keyframes robot-shadow {
-  0%, 100% { transform: scaleX(1); opacity: 0.3; }
-  24%      { transform: scaleX(0.7); opacity: 0.15; }
-  56%      { transform: scaleX(0.75); opacity: 0.18; }
-}
-
-@keyframes robot-eyes {
-  0%, 90%, 100% { opacity: 1; }
-  92% { opacity: 0.2; }
-  94% { opacity: 1; }
-  96% { opacity: 0.2; }
-  98% { opacity: 1; }
+@keyframes robot-shadow-pulse {
+  0%, 100% { transform: scaleX(1); opacity: 0.25; }
+  30% { transform: scaleX(0.65); opacity: 0.12; }
+  70% { transform: scaleX(0.7); opacity: 0.15; }
 }
 
 .optimus-robot {
-  animation: robot-dance 2s ease-in-out infinite;
+  animation: robot-dance 2.2s ease-in-out infinite;
   transform-origin: bottom center;
-  filter: drop-shadow(0 0 10px rgba(232, 33, 39, 0.35));
+  filter: drop-shadow(0 0 8px rgba(232, 33, 39, 0.3));
   transition: filter 0.3s;
 }
 
 .optimus-robot:hover {
-  filter: drop-shadow(0 0 25px rgba(232, 33, 39, 0.7));
+  filter: drop-shadow(0 0 20px rgba(232, 33, 39, 0.6));
 }
 
 .robot-shadow {
-  width: 40px;
-  height: 6px;
-  background: radial-gradient(ellipse, rgba(232, 33, 39, 0.3) 0%, transparent 70%);
+  width: 36px;
+  height: 5px;
+  background: radial-gradient(ellipse, rgba(232, 33, 39, 0.25) 0%, transparent 70%);
   border-radius: 50%;
   margin: 2px auto 0;
-  animation: robot-shadow 2s ease-in-out infinite;
+  animation: robot-shadow-pulse 2.2s ease-in-out infinite;
 }
 
 /* ===== CARD GLOW BORDER ===== */
@@ -125,11 +126,11 @@ const loginStyles = `
   padding: 1.5px;
   background: linear-gradient(
     270deg,
-    rgba(232, 33, 39, 0.6),
-    rgba(232, 33, 39, 0.1),
+    rgba(232, 33, 39, 0.5),
+    rgba(232, 33, 39, 0.05),
     transparent,
-    rgba(232, 33, 39, 0.1),
-    rgba(232, 33, 39, 0.6)
+    rgba(232, 33, 39, 0.05),
+    rgba(232, 33, 39, 0.5)
   );
   background-size: 400% 100%;
   animation: border-sweep 6s ease-in-out infinite;
@@ -142,8 +143,8 @@ const loginStyles = `
 /* ===== FLOATING PARTICLES ===== */
 @keyframes particle-rise {
   0%   { opacity: 0; transform: translateY(0) scale(0); }
-  15%  { opacity: 1; transform: translateY(-8px) scale(1); }
-  85%  { opacity: 0.4; transform: translateY(-50px) scale(0.4); }
+  15%  { opacity: 0.8; transform: translateY(-8px) scale(1); }
+  85%  { opacity: 0.3; transform: translateY(-50px) scale(0.3); }
   100% { opacity: 0; transform: translateY(-60px) scale(0); }
 }
 
@@ -157,19 +158,25 @@ const loginStyles = `
   animation: particle-rise 3.5s ease-out infinite;
 }
 
-/* ===== PULSE RING ON LOGO ===== */
+/* ===== LOGO PULSE ===== */
 @keyframes pulse-ring {
-  0%   { transform: scale(0.8); opacity: 0.6; }
-  50%  { transform: scale(1.15); opacity: 0; }
-  100% { transform: scale(0.8); opacity: 0; }
+  0%   { transform: scale(0.85); opacity: 0.5; }
+  50%  { transform: scale(1.1); opacity: 0; }
+  100% { transform: scale(0.85); opacity: 0; }
 }
 
 .logo-pulse {
   position: absolute;
   inset: -8px;
-  border: 1.5px solid rgba(232, 33, 39, 0.4);
+  border: 1.5px solid rgba(232, 33, 39, 0.35);
   border-radius: 50%;
   animation: pulse-ring 3s ease-out infinite;
+  pointer-events: none;
+}
+
+/* ===== BG SLIDE INDICATOR ===== */
+.slide-dot {
+  transition: all 0.5s ease;
 }
 `;
 
@@ -183,7 +190,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
-  // Background slideshow
+  // Background slideshow — 5 second interval
   useEffect(() => {
     const interval = setInterval(() => {
       setBgIndex((prev) => (prev + 1) % BG_IMAGES.length);
@@ -200,12 +207,10 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await login(form);
-
       if (result?.requiresVerification) {
         setOtpState((prev) => ({ ...prev, open: true, email: result.email, code: '' }));
         return;
       }
-
       if (result?.success) {
         navigate('/');
       }
@@ -269,7 +274,7 @@ const Login = () => {
       {BG_IMAGES.map((img, i) => (
         <div
           key={img}
-          className="bg-slide"
+          className={`bg-slide ${i === bgIndex ? 'active' : ''}`}
           style={{
             backgroundImage: `url(${img})`,
             opacity: i === bgIndex ? 1 : 0,
@@ -277,27 +282,46 @@ const Login = () => {
           }}
         />
       ))}
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px] z-[1]" />
+      {/* Gradient overlay — darker at center for card readability, lighter at edges to show car */}
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.75) 100%)',
+        }}
+      />
+      {/* Bottom gradient fade */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-32 z-[1]"
+        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)' }}
+      />
 
-      {/* Background slide indicators */}
-      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[60] flex gap-2">
+      {/* Slide indicators */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2.5">
         {BG_IMAGES.map((_, i) => (
           <button
             key={i}
             onClick={() => setBgIndex(i)}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              i === bgIndex ? 'w-6 bg-primary' : 'w-1.5 bg-white/30 hover:bg-white/50'
+            className={`slide-dot rounded-full ${
+              i === bgIndex
+                ? 'h-2 w-7 bg-primary shadow-md shadow-primary/40'
+                : 'h-2 w-2 bg-white/25 hover:bg-white/40'
             }`}
           />
         ))}
+      </div>
+
+      {/* Car name label */}
+      <div className="absolute bottom-[88px] left-1/2 -translate-x-1/2 z-[60]">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 transition-opacity duration-500">
+          {bgIndex === 0 ? 'Cybertruck' : 'Model 3'}
+        </p>
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-3 py-4 sm:px-4 sm:py-8 lg:px-8">
         <div className="relative w-full max-w-md sm:max-w-lg animate-fade-in" style={{ overflow: 'visible' }}>
 
-          {/* Tesla Car driving around card */}
+          {/* Tesla Car — drives across top then bottom, no flipping/rotation */}
           <img src="/teslacar.png" alt="" className="tesla-car" />
 
           {/* Floating particles */}
@@ -306,9 +330,9 @@ const Login = () => {
               key={i}
               className="particle"
               style={{
-                left: `${10 + i * 11}%`,
+                left: `${8 + i * 12}%`,
                 top: `${5 + (i % 4) * 25}%`,
-                animationDelay: `${i * 0.4}s`,
+                animationDelay: `${i * 0.45}s`,
                 animationDuration: `${3 + (i % 3) * 0.5}s`,
               }}
             />
@@ -322,47 +346,34 @@ const Login = () => {
               <div className="flex flex-col items-center text-center">
 
                 {/* Robot + Logo + Robot */}
-                <div className="relative mb-4 flex items-end justify-center gap-4 sm:mb-6 sm:gap-6">
+                <div className="relative mb-4 flex items-end justify-center gap-4 sm:mb-5 sm:gap-6">
                   {/* Left Optimus */}
                   <div className="flex flex-col items-center">
                     <div className="optimus-robot">
-                      <img
-                        src="/optimus.png"
-                        alt="Optimus"
-                        className="h-12 w-auto object-contain sm:h-[72px] lg:h-20"
-                      />
+                      <img src="/optimus.png" alt="Optimus" className="h-12 w-auto object-contain sm:h-[68px] lg:h-20" />
                     </div>
                     <div className="robot-shadow" />
                   </div>
 
-                  {/* Tesla Logo with pulse */}
+                  {/* Tesla Logo with pulse rings */}
                   <div className="relative flex-shrink-0">
                     <div className="logo-pulse" />
                     <div className="logo-pulse" style={{ animationDelay: '1s' }} />
-                    <img
-                      src="/main.png"
-                      alt="Tesla"
-                      className="relative h-16 w-16 object-contain sm:h-20 sm:w-20"
-                    />
+                    <img src="/main.png" alt="Tesla" className="relative h-16 w-16 object-contain sm:h-20 sm:w-20" />
                   </div>
 
-                  {/* Right Optimus (mirrored, offset timing) */}
+                  {/* Right Optimus (mirrored, offset) */}
                   <div className="flex flex-col items-center">
-                    <div className="optimus-robot" style={{ animationDelay: '0.25s' }}>
-                      <img
-                        src="/optimus.png"
-                        alt="Optimus"
-                        className="h-12 w-auto object-contain sm:h-[72px] lg:h-20"
-                        style={{ transform: 'scaleX(-1)' }}
-                      />
+                    <div className="optimus-robot" style={{ animationDelay: '0.3s' }}>
+                      <img src="/optimus.png" alt="Optimus" className="h-12 w-auto object-contain sm:h-[68px] lg:h-20" style={{ transform: 'scaleX(-1)' }} />
                     </div>
-                    <div className="robot-shadow" style={{ animationDelay: '0.25s' }} />
+                    <div className="robot-shadow" style={{ animationDelay: '0.3s' }} />
                   </div>
                 </div>
 
                 {/* Branding */}
                 <p className="text-[10px] uppercase tracking-[0.5em] text-primary/70 sm:text-xs">Tesla Ops</p>
-                <h1 className="mt-1.5 font-heading text-lg font-bold text-white sm:mt-2.5 sm:text-2xl lg:text-[28px]">
+                <h1 className="mt-1.5 font-heading text-lg font-bold text-white sm:mt-2 sm:text-2xl lg:text-[28px]">
                   Manufacturing & Quality Vault
                 </h1>
                 <p className="mt-1 text-[11px] text-slate-400/80 sm:mt-1.5 sm:text-sm">
@@ -458,10 +469,7 @@ const Login = () => {
               <div className="text-center">
                 <p className="text-xs text-slate-400 sm:text-sm">
                   Need access?{' '}
-                  <Link
-                    to="/register"
-                    className="font-semibold text-primary transition-all hover:text-red-400 hover:underline underline-offset-2"
-                  >
+                  <Link to="/register" className="font-semibold text-primary transition-all hover:text-red-400 hover:underline underline-offset-2">
                     Create an account
                   </Link>
                 </p>
@@ -475,7 +483,6 @@ const Login = () => {
               </p>
             </div>
           </div>
-
         </div>
       </div>
 
