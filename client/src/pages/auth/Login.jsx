@@ -4,27 +4,141 @@ import { useAuth } from '../../context/AuthContext.jsx';
 import VerificationModal from '../../components/auth/VerificationModal.jsx';
 import Footer from '../../components/common/Footer.jsx';
 
-const movingCarStyles = `
-@keyframes drive-around {
-  0% { top: -20px; left: -40px; transform: rotate(0deg); }
-  25% { top: -20px; left: calc(100% - 40px); transform: rotate(0deg); }
-  25.01% { transform: rotate(90deg); }
-  50% { top: calc(100% - 20px); left: calc(100% - 40px); transform: rotate(90deg); }
-  50.01% { transform: rotate(180deg); }
-  75% { top: calc(100% - 20px); left: -40px; transform: rotate(180deg); }
-  75.01% { transform: rotate(270deg); }
-  100% { top: -20px; left: -40px; transform: rotate(270deg); }
+const loginAnimations = `
+/* Tesla car smoothly driving around the card border */
+@keyframes drive-top {
+  0% { left: -60px; top: -24px; }
+  100% { left: calc(100% - 20px); top: -24px; }
 }
-.moving-car {
+@keyframes drive-right {
+  0% { left: calc(100% - 20px); top: -24px; }
+  100% { left: calc(100% - 20px); top: calc(100% - 16px); }
+}
+@keyframes drive-bottom {
+  0% { left: calc(100% - 20px); top: calc(100% - 16px); }
+  100% { left: -60px; top: calc(100% - 16px); }
+}
+@keyframes drive-left {
+  0% { left: -60px; top: calc(100% - 16px); }
+  100% { left: -60px; top: -24px; }
+}
+
+.tesla-car {
   position: absolute;
-  width: 80px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 6px;
+  width: clamp(60px, 10vw, 90px);
+  height: auto;
   z-index: 50;
   pointer-events: none;
-  filter: drop-shadow(0 0 10px rgba(232, 33, 39, 0.7));
-  animation: drive-around 8s linear infinite;
+  filter: drop-shadow(0 0 12px rgba(232, 33, 39, 0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  animation: drive-top 3s linear 0s,
+             drive-right 2.5s linear 3s,
+             drive-bottom 3s linear 5.5s,
+             drive-left 2.5s linear 8.5s;
+  animation-iteration-count: infinite;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  animation: drive-circuit 11s linear infinite;
+}
+
+@keyframes drive-circuit {
+  0% { left: -60px; top: -24px; transform: scaleX(1); }
+  27% { left: calc(100% - 20px); top: -24px; transform: scaleX(1); }
+  27.5% { left: calc(100% - 20px); top: -24px; transform: scaleX(1) rotate(90deg); }
+  49.5% { left: calc(100% - 20px); top: calc(100% - 16px); transform: scaleX(1) rotate(90deg); }
+  50% { left: calc(100% - 20px); top: calc(100% - 16px); transform: scaleX(-1); }
+  77% { left: -60px; top: calc(100% - 16px); transform: scaleX(-1); }
+  77.5% { left: -60px; top: calc(100% - 16px); transform: scaleX(-1) rotate(90deg); }
+  99.5% { left: -60px; top: -24px; transform: scaleX(-1) rotate(90deg); }
+  100% { left: -60px; top: -24px; transform: scaleX(1); }
+}
+
+/* Red glow trail behind the car */
+.tesla-car::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(232, 33, 39, 0.6));
+  border-radius: 2px;
+  bottom: 2px;
+  left: -25px;
+}
+
+/* Optimus robot dancing animation */
+@keyframes robot-dance {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  10% { transform: translateY(-6px) rotate(-3deg); }
+  20% { transform: translateY(0) rotate(3deg); }
+  30% { transform: translateY(-8px) rotate(0deg) scaleY(1.02); }
+  40% { transform: translateY(0) rotate(-2deg) scaleY(0.98); }
+  50% { transform: translateY(-5px) rotate(2deg); }
+  60% { transform: translateY(0) rotate(-3deg) scaleX(1.02); }
+  70% { transform: translateY(-7px) rotate(0deg); }
+  80% { transform: translateY(0) rotate(3deg) scaleY(1.01); }
+  90% { transform: translateY(-4px) rotate(-2deg); }
+}
+
+@keyframes robot-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(232, 33, 39, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(232, 33, 39, 0.6)) drop-shadow(0 0 40px rgba(232, 33, 39, 0.2)); }
+}
+
+@keyframes robot-hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.optimus-robot {
+  animation: robot-dance 2.5s ease-in-out infinite, robot-glow 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Subtle floating particles around the card */
+@keyframes float-particle {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0); }
+  20% { opacity: 1; transform: translateY(-10px) scale(1); }
+  80% { opacity: 0.5; transform: translateY(-40px) scale(0.5); }
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #e82127;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float-particle 3s ease-in-out infinite;
+}
+
+/* Red accent line animation on card border */
+@keyframes border-glow {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+.card-border-glow {
+  position: relative;
+}
+
+.card-border-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(232,33,39,0.4), transparent 40%, transparent 60%, rgba(232,33,39,0.4));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-glow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Headlight beams */
+@keyframes headlight {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 `;
 
@@ -44,34 +158,30 @@ const Login = () => {
     setLoading(true);
     try {
       const result = await login(form);
-      
-      // Check if verification is required
+
       if (result?.requiresVerification) {
-        setOtpState((prev) => ({ 
-          ...prev, 
-          open: true, 
-          email: result.email, 
-          code: '' 
+        setOtpState((prev) => ({
+          ...prev,
+          open: true,
+          email: result.email,
+          code: ''
         }));
         return;
       }
 
-      // If login successful, navigate to dashboard
       if (result?.success) {
         navigate('/');
       }
     } catch (error) {
-      // Check if error is due to unverified account (403)
       if (error.response?.status === 403 && error.response?.data?.requiresVerification) {
-        setOtpState((prev) => ({ 
-          ...prev, 
-          open: true, 
-          email: error.response.data.email || form.email, 
-          code: '' 
+        setOtpState((prev) => ({
+          ...prev,
+          open: true,
+          email: error.response.data.email || form.email,
+          code: ''
         }));
         return;
       }
-      // Other errors are handled by toast in context
     } finally {
       setLoading(false);
     }
@@ -83,8 +193,7 @@ const Login = () => {
     try {
       await verifyOtp({ email: otpState.email, code: otpState.code });
       setOtpState({ open: false, email: '', code: '', verifying: false, resending: false });
-      
-      // Show success message and close modal
+
       const Swal = (await import('sweetalert2')).default;
       await Swal.fire({
         icon: 'success',
@@ -104,7 +213,7 @@ const Login = () => {
         allowOutsideClick: false,
         allowEscapeKey: false
       });
-      
+
       navigate('/');
     } catch (error) {
       // toast shows error
@@ -127,25 +236,66 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
+
   return (
-    <div className="relative flex min-h-screen flex-col bg-secondary safe-area-top safe-area-bottom touch-manipulation">
-      <style>{movingCarStyles}</style>
+    <div className="relative flex min-h-screen flex-col bg-secondary safe-area-top safe-area-bottom touch-manipulation overflow-hidden">
+      <style>{loginAnimations}</style>
+
       {/* Main container */}
       <div className="flex flex-1 flex-col items-center justify-center px-3 py-4 sm:px-4 sm:py-8 lg:px-8">
         <div className="relative w-full max-w-md sm:max-w-lg animate-fade-in" style={{ overflow: 'visible' }}>
-          <img src="/teslacar.jpg" alt="" className="moving-car" />
+
+          {/* Tesla Car driving around the card */}
+          <img src="/teslacar.png" alt="" className="tesla-car" />
+
+          {/* Floating particles */}
+          {[...Array(6)].map((_, i) => (
+            <span
+              key={i}
+              className="particle"
+              style={{
+                left: `${15 + i * 15}%`,
+                top: `${10 + (i % 3) * 30}%`,
+                animationDelay: `${i * 0.5}s`,
+                animationDuration: `${2.5 + i * 0.3}s`,
+              }}
+            />
+          ))}
+
           {/* Card */}
-          <div className="rounded-2xl border border-white/10 bg-[#0e0f13]/95 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:rounded-3xl animate-scale-in">
-            {/* Header with logo */}
-            <div className="border-b border-white/5 px-4 py-4 sm:px-8 sm:py-8 lg:py-10">
+          <div className="card-border-glow rounded-2xl border border-white/10 bg-[#0e0f13]/95 shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:rounded-3xl animate-scale-in">
+            {/* Header with logo + Robot */}
+            <div className="border-b border-white/5 px-4 py-4 sm:px-8 sm:py-6 lg:py-8">
               <div className="flex flex-col items-center text-center">
-                {/* Tesla Logo */}
-                <div className="mb-4 sm:mb-6">
-                  <img
-                    src="/logo.png"
-                    alt="Tesla"
-                    className="h-16 w-16 object-contain sm:h-20 sm:w-20"
-                  />
+                {/* Tesla Logo + Optimus side by side */}
+                <div className="relative mb-4 flex items-end justify-center gap-3 sm:mb-6 sm:gap-5">
+                  {/* Optimus Robot - Dancing */}
+                  <div className="optimus-robot flex-shrink-0">
+                    <img
+                      src="/optimus.png"
+                      alt="Optimus"
+                      className="h-14 w-auto object-contain sm:h-20 lg:h-24"
+                    />
+                  </div>
+
+                  {/* Tesla Logo */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src="/main.png"
+                      alt="Tesla"
+                      className="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                    />
+                  </div>
+
+                  {/* Mirrored Optimus Robot */}
+                  <div className="optimus-robot flex-shrink-0" style={{ animationDelay: '0.3s' }}>
+                    <img
+                      src="/optimus.png"
+                      alt="Optimus"
+                      className="h-14 w-auto object-contain sm:h-20 lg:h-24"
+                      style={{ transform: 'scaleX(-1)' }}
+                    />
+                  </div>
                 </div>
 
                 {/* Branding */}
